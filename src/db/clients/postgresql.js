@@ -291,7 +291,9 @@ function _configDatabase(server, database) {
     config.port = server.config.localPort;
   }
 
-  if (server.config.ssl) config.ssl = server.config.ssl;
+  if (server.config.ssl) {
+      config.ssl = server.config.ssl;
+  }
 
   return config;
 }
