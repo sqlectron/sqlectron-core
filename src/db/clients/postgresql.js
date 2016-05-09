@@ -292,7 +292,7 @@ function _configDatabase(server, database) {
   }
 
   if (server.config.ssl) {
-      config.ssl = server.config.ssl;
+    config.ssl = server.config.ssl;
   }
 
   return config;
