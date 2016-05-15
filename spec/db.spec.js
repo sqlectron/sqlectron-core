@@ -544,6 +544,12 @@ describe('db', () => {
               it('should execute a single query', async () => {
                 const results = await dbConn.executeQuery('create database db_test_create_database');
 
+                // MSSQL does not return any information about CREATE queries
+                if (dbClient === 'sqlserver') {
+                  expect(results).to.have.length(0);
+                  return;
+                }
+
                 expect(results).to.have.length(1);
                 const [result] = results;
 
@@ -553,14 +559,7 @@ describe('db', () => {
                 // seems each DB client returns a different value for CREATE
                 expect(result).to.have.property('affectedRows').to.oneOf([0, 1, undefined]);
                 expect(result).to.have.property('isSelect').to.eql(false);
-
-                // MSSQL does not return row count
-                // so this value is based in the number of rows
-                if (dbClient === 'sqlserver') {
-                  expect(result).to.have.property('rowCount').to.eql(0);
-                } else {
-                  expect(result).to.have.property('rowCount').to.eql(undefined);
-                }
+                expect(result).to.have.property('rowCount').to.eql(undefined);
               });
             });
           });
@@ -578,6 +577,12 @@ describe('db', () => {
               it('should execute a single query', async () => {
                 const results = await dbConn.executeQuery('drop database db_test_create_database');
 
+                // MSSQL does not return any information about DROP queries
+                if (dbClient === 'sqlserver') {
+                  expect(results).to.have.length(0);
+                  return;
+                }
+
                 expect(results).to.have.length(1);
                 const [result] = results;
 
@@ -587,14 +592,7 @@ describe('db', () => {
                 // seems each DB client returns a different value for DROP
                 expect(result).to.have.property('affectedRows').to.oneOf([0, 1, undefined]);
                 expect(result).to.have.property('isSelect').to.eql(false);
-
-                // MSSQL does not return row count
-                // so this value is based in the number of rows
-                if (dbClient === 'sqlserver') {
-                  expect(result).to.have.property('rowCount').to.eql(0);
-                } else {
-                  expect(result).to.have.property('rowCount').to.eql(undefined);
-                }
+                expect(result).to.have.property('rowCount').to.eql(undefined);
               });
             });
           });
