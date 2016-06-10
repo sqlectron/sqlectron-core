@@ -160,6 +160,23 @@ describe('db', () => {
           });
         });
 
+        describe('.getTableKeys', () => {
+          it('should list all tables keys', async() => {
+            const references = await dbConn.getTableKeys('users');
+            const [primaryKey, foreignKey] = references;
+
+            expect(references).to.have.length(2);
+
+            expect(primaryKey).to.have.property('columnName').to.eql('id');
+            expect(primaryKey).to.have.property('referencedTable').to.be.a('null');
+            expect(primaryKey).to.have.property('keyType').to.eql('PRIMARY KEY');
+
+            expect(foreignKey).to.have.property('columnName').to.eql('role_id');
+            expect(foreignKey).to.have.property('referencedTable').to.eql('roles');
+            expect(foreignKey).to.have.property('keyType').to.eql('FOREIGN KEY');
+          });
+        });
+
         describe('.getTableCreateScript', () => {
           it('should return table create script', async() => {
             const [createScript] = await dbConn.getTableCreateScript('users');
