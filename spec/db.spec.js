@@ -163,18 +163,19 @@ describe('db', () => {
         describe('.getTableKeys', () => {
           it('should list all tables keys', async() => {
             const tableKeys = await dbConn.getTableKeys('users');
-            const [firstKey, secondKey] = tableKeys;
 
             expect(tableKeys).to.have.length(2);
 
-            if ( firstKey.keyType === 'PRIMARY KEY') {
-              expect(firstKey).to.have.property('columnName').to.eql('id');
-              expect(firstKey).to.have.property('referencedTable').to.be.a('null');
-            } else {
-              expect(secondKey).to.have.property('columnName').to.eql('role_id');
-              expect(secondKey).to.have.property('referencedTable').to.eql('roles');
-              expect(secondKey).to.have.property('keyType').to.eql('FOREIGN KEY');
-            }
+            tableKeys.map((key) => {
+              if ( key.keyType === 'PRIMARY KEY') {
+                expect(key).to.have.property('columnName').to.eql('id');
+                expect(key).to.have.property('referencedTable').to.be.a('null');
+              } else {
+                expect(key).to.have.property('columnName').to.eql('role_id');
+                expect(key).to.have.property('referencedTable').to.eql('roles');
+                expect(key).to.have.property('keyType').to.eql('FOREIGN KEY');
+              }
+            });
           });
         });
 
