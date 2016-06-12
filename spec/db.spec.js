@@ -162,18 +162,19 @@ describe('db', () => {
 
         describe('.getTableKeys', () => {
           it('should list all tables keys', async() => {
-            const references = await dbConn.getTableKeys('users');
-            const [primaryKey, foreignKey] = references;
+            const tableKeys = await dbConn.getTableKeys('users');
+            const [firstKey, secondKey] = tableKeys;
 
-            expect(references).to.have.length(2);
+            expect(tableKeys).to.have.length(2);
 
-            expect(primaryKey).to.have.property('columnName').to.eql('id');
-            expect(primaryKey).to.have.property('referencedTable').to.be.a('null');
-            expect(primaryKey).to.have.property('keyType').to.eql('PRIMARY KEY');
-
-            expect(foreignKey).to.have.property('columnName').to.eql('role_id');
-            expect(foreignKey).to.have.property('referencedTable').to.eql('roles');
-            expect(foreignKey).to.have.property('keyType').to.eql('FOREIGN KEY');
+            if ( firstKey.keyType === 'PRIMARY KEY') {
+              expect(firstKey).to.have.property('columnName').to.eql('id');
+              expect(firstKey).to.have.property('referencedTable').to.be.a('null');
+            } else {
+              expect(secondKey).to.have.property('columnName').to.eql('role_id');
+              expect(secondKey).to.have.property('referencedTable').to.eql('roles');
+              expect(secondKey).to.have.property('keyType').to.eql('FOREIGN KEY');
+            }
           });
         });
 
