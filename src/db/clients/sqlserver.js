@@ -148,15 +148,15 @@ export const getTableKeys = async (connection, table) => {
     SELECT
       tc.constraint_name,
     	kcu.column_name,
-    	CASE WHEN tc.constraint_type LIKE '%FOREIGN%' THEN ctu.table_name
+    	CASE WHEN tc.constraint_type LIKE '%FOREIGN%' THEN OBJECT_NAME(sfk.referenced_object_id)
     	ELSE NULL
     	END AS referenced_table_name,
     	tc.constraint_type
   	FROM information_schema.table_constraints AS tc
   	JOIN information_schema.key_column_usage AS kcu
     	ON tc.constraint_name = kcu.constraint_name
-  	JOIN information_schema.constraint_table_usage as ctu
-    	ON tc.constraint_name = ctu.constraint_name
+  	JOIN sys.foreign_keys as sfk
+    	ON sfk.parent_object_id = OBJECT_ID(tc.table_name)
   	WHERE tc.table_name = '${table}'
   	AND tc.constraint_type IN ('PRIMARY KEY', 'FOREIGN KEY')
   `;
