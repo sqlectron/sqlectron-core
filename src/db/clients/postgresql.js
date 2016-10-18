@@ -283,7 +283,7 @@ export function getTableCreateScript(client, table, schema) {
         , E',\n'
       ) || E'\n);\n' ||
       CASE WHEN tc.constraint_name IS NULL THEN ''
-           ELSE E'\nALTER TABLE ' || quote_ident(tabdef.table_name) ||
+           ELSE E'\nALTER TABLE ' || quote_ident($2) || '.' || quote_ident(tabdef.table_name) ||
            ' ADD CONSTRAINT ' || quote_ident(tc.constraint_name)  ||
            ' PRIMARY KEY ' || '(' || substring(constr.column_name from 0 for char_length(constr.column_name)-1) || ')'
       END AS createtable
