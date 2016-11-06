@@ -27,6 +27,7 @@ export default function (server, database) {
     listRoutines: () => listRoutines(conn),
     listTableColumns: (db, table) => listTableColumns(conn, db, table),
     listTableTriggers: (table) => listTableTriggers(conn, table),
+    listTableIndexes: (table) => listTableIndexes(conn, table),
     listSchemas: () => listSchemas(conn),
     getTableReferences: (table) => getTableReferences(conn, table),
     getTableKeys: (db, table) => getTableKeys(conn, db, table),
@@ -125,6 +126,22 @@ export async function listTableTriggers(conn, table) {
   const { data } = await driverExecuteQuery(conn, { query: sql, params });
 
   return data.map((row) => row.trigger_name);
+}
+
+export async function listTableIndexes(conn, table) {
+  const schema = await getSchema(conn);
+
+  const sql = `
+  SHOW INDEX FROM ${table} FROM ${schema};
+  `;
+
+  const params = [
+    table,
+  ];
+
+  const { data } = await driverExecuteQuery(conn, { query: sql, params });
+
+  return data.map((row) => row.Key_name);
 }
 
 export function listSchemas() {
