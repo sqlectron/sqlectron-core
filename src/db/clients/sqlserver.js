@@ -188,7 +188,7 @@ export async function listTableTriggers(conn, table) {
 export async function listTableIndexes(conn, table) {
   // SQL Server does not have information_schema for indexes, so other way around
   // is using sp_helpindex stored procedure to fetch indexes related to table
-  const sql = `EXEC sp_helpindex ${wrapIdentifier(table)}`;
+  const sql = `EXEC sp_helpindex ${table}`;
 
   const { data } = await driverExecuteQuery(conn, { query: sql });
 
