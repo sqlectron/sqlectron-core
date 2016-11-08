@@ -152,7 +152,7 @@ function listTableTriggers(server, database, table, schema) {
 
 function listTableIndexes(server, database, table, schema) {
   checkIsConnected(server, database);
-  return database.connection.listTableIndexes(table, schema);
+  return database.connection.listTableIndexes(table, database.database, schema);
 }
 
 function getTableReferences(server, database, table, schema) {
