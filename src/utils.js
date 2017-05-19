@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import pf from 'portfinder';
+import crypto from 'crypto';
 
 
 export function getConfigPath() {
@@ -121,4 +122,16 @@ export function createCancelablePromise(error, timeIdle = 100) {
       discarded = true;
     },
   };
+}
+
+
+export function encryptString(str) {
+  const cipher = crypto.createCipher('aes192', 'sqlectron');
+  return cipher.update(str, 'utf8', 'hex') + cipher.final('hex');
+}
+
+
+export function decryptString(str) {
+  const decipher = crypto.createDecipher('aes192', 'sqlectron');
+  return decipher.update(str, 'hex', 'utf8') + decipher.final('utf8');
 }

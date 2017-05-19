@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { servers } from '../src';
-import { readJSONFile } from './../src/utils';
+import { readJSONFile, encryptString } from './../src/utils';
 import utilsStub from './utils-stub';
 
 
@@ -85,8 +85,11 @@ describe('servers', () => {
       expect(updatedServer).to.eql(serverToUpdate);
 
       const configAfter = await loadConfig();
+      const hashedServerToUpdate = { ...serverToUpdate };
+      hashedServerToUpdate.hashedPwd = true;
+      hashedServerToUpdate.password = encryptString(serverToUpdate.password);
       expect(configAfter.servers.length).to.eql(configBefore.servers.length);
-      expect(configAfter.servers.find((srv) => srv.id === id)).to.eql(serverToUpdate);
+      expect(configAfter.servers.find((srv) => srv.id === id)).to.eql(hashedServerToUpdate);
     });
   });
 
@@ -133,8 +136,11 @@ describe('servers', () => {
         expect(updatedServer).to.eql(serverToUpdate);
 
         const configAfter = await loadConfig();
+        const hashedServerToUpdate = { ...serverToUpdate };
+        hashedServerToUpdate.hashedPwd = true;
+        hashedServerToUpdate.password = encryptString(serverToUpdate.password);
         expect(configAfter.servers.length).to.eql(configBefore.servers.length);
-        expect(configAfter.servers.find((srv) => srv.id === id)).to.eql(serverToUpdate);
+        expect(configAfter.servers.find((srv) => srv.id === id)).to.eql(hashedServerToUpdate);
       });
     });
   });

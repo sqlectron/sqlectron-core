@@ -12,6 +12,12 @@ function sanitizeServers(data) {
     // ensure all servers has the new fileld SSL
     if (srv.ssl === undefined) { srv.ssl = false; }
 
+    // store password as a hash instead of plain text
+    if (!srv.hashedPwd) {
+      srv.password = utils.encryptString(srv.password);
+      srv.hashedPwd = true;
+    }
+
     return srv;
   });
 }
@@ -64,16 +70,39 @@ export function path() {
 
 export function get() {
   const filename = utils.getConfigPath();
-  return utils.readJSONFile(filename);
+  return utils.readJSONFile(filename)
+    .then((data) => {
+      const configData = { ...data };
+      configData.servers = configData.servers.map((server) => {
+        const srv = { ...server };
+        if (srv.hashedPwd) { srv.password = utils.decryptString(srv.password); }
+        return srv;
+      });
+      return configData;
+    });
 }
 
 export function getSync() {
   const filename = utils.getConfigPath();
-  return utils.readJSONFileSync(filename);
+  const data = utils.readJSONFileSync(filename);
+  data.servers = data.servers.map((server) => {
+    const srv = { ...server };
+    if (srv.hashedPwd) { srv.password = utils.decryptString(srv.password); }
+    return srv;
+  });
+  return data;
 }
 
 
 export function save(data) {
   const filename = utils.getConfigPath();
-  return utils.writeJSONFile(filename, data);
+  const configData = { ...data };
+  configData.servers = configData.servers.map((server) => {
+    const srv = { ...server };
+    // encrypt password
+    srv.password = utils.encryptString(srv.password);
+    srv.hashedPwd = true;
+    return srv;
+  });
+  return utils.writeJSONFile(filename, configData);
 }
