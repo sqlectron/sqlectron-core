@@ -32,4 +32,9 @@ export default {
     port: 9042,
     database: 'sqlectron',
   },
+  cassandra2x: {
+    host: url.parse(process.env.CASSANDRA2X_PORT || '').hostname,
+    port: 9042,
+    database: 'sqlectron',
+  },
 };

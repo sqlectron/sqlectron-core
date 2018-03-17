@@ -6,6 +6,12 @@ environment:
   # While that is not configured we do not
   # run automated test for cassandra client
   CASSANDRA_PORT: tcp://localhost:9042
+
+  # Disabling Cassandra 2.x testing by default, as a Cassandra 2.x container
+  # take minutes to start and will likely fail on CI.
+  ENABLE_CASSANDRA2X_TEST: 0
+  CASSANDRA2X_PORT: tcp://cassandra2x:9042
+
   DB_CLIENTS: mysql,postgresql,sqlserver,sqlite
   # postgres
   POSTGRES_PORT: tcp://localhost:5432

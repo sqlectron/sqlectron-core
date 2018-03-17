@@ -7,12 +7,21 @@ import setupCassandra from './databases/cassandra/setup';
 
 chai.use(chaiAsPromised);
 
+const enableCassandra2xTests = process.env.ENABLE_CASSANDRA2X_TEST;
+
 /**
  * List of supported DB clients.
  * The "integration" tests will be executed for all supported DB clients.
  * And ensure all these clients has the same API and output results.
  */
-const SUPPORTED_DB_CLIENTS = db.CLIENTS.map((client) => client.key);
+const SUPPORTED_DB_CLIENTS = db.CLIENTS.map((client) => ({
+  client: client.key,
+  connection: client.key,
+}));
+if (enableCassandra2xTests) {
+  // also test the Cassandra client against v2.x
+  SUPPORTED_DB_CLIENTS.push({ client: 'cassandra', connection: 'cassandra2x' });
+}
 
 const dbSchemas = {
   postgresql: 'public',
@@ -22,29 +31,36 @@ const dbSchemas = {
 /**
  * List of selected databases to be tested in the current task
  */
-const dbsToTest = (process.env.DB_CLIENTS || '').split(',').filter((client) => !!client);
-
+const dbsToTest = (process.env.DB_CLIENTS || '')
+  .split(',')
+  .filter((client) => !!client);
 
 describe('db', () => {
-  const dbClients = dbsToTest.length ? dbsToTest : SUPPORTED_DB_CLIENTS;
-  if (dbClients.some((dbClient) => !~SUPPORTED_DB_CLIENTS.indexOf(dbClient))) {
-    throw new Error('Invalid selected db client for tests');
-  }
+  const dbClients = dbsToTest.length ? [] : SUPPORTED_DB_CLIENTS;
+  dbsToTest.forEach((name) => {
+    const selected = SUPPORTED_DB_CLIENTS.filter((el) => el.client === name);
+    if (!selected.length) throw new Error('Invalid selected db client for tests');
+    dbClients.push(...selected);
+  });
 
-  if (~dbClients.indexOf('sqlite')) {
+  if (~dbClients.findIndex((el) => el.client === 'sqlite')) {
     setupSQLite(config.sqlite);
-  } else if (~dbClients.indexOf('cassandra')) {
+  }
+  if (~dbClients.findIndex((el) => el.client === 'cassandra')) {
     setupCassandra(config.cassandra);
+    if (enableCassandra2xTests) setupCassandra(config.cassandra2x);
   }
 
-  dbClients.forEach((dbClient) => {
+  dbClients.forEach((d) => {
+    const dbClient = d.client;
+    const dbConnName = d.connection;
     const dbSchema = dbSchemas[dbClient];
 
-    describe(dbClient, () => {
+    describe(`${dbClient}(${dbConnName})`, () => {
       describe('.connect', () => {
         it(`should connect into a ${dbClient} database`, () => {
           const serverInfo = {
-            ...config[dbClient],
+            ...config[dbConnName],
             name: dbClient,
             client: dbClient,
           };
@@ -57,7 +73,7 @@ describe('db', () => {
 
         it('should connect into server without database specified', () => {
           const serverInfo = {
-            ...config[dbClient],
+            ...config[dbConnName],
             database: db.CLIENTS.find((c) => c.key === dbClient).defaultDatabase,
             name: dbClient,
             client: dbClient,
@@ -72,7 +88,7 @@ describe('db', () => {
 
       describe('given is already connected', () => {
         const serverInfo = {
-          ...config[dbClient],
+          ...config[dbConnName],
           name: dbClient,
           client: dbClient,
         };
@@ -667,7 +683,10 @@ describe('db', () => {
                 }
               } catch (err) {
                 if (dbClient === 'cassandra') {
-                  expect(err.message).to.eql('line 1:13 mismatched character \'<EOF>\' expecting set null');
+                  expect(err.message).to.be.oneOf([
+                    'line 1:13 mismatched character \'<EOF>\' expecting set null', // Cassandra 3.x
+                    'line 0:-1 no viable alternative at input \'<EOF>\'', // Cassandra 2.x
+                  ]);
                 } else {
                   throw err;
                 }

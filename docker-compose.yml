@@ -27,6 +27,14 @@ cassandra:
     - 7000 # cluster
     - 9042 # native
 
+cassandra2x:
+  image: cassandra:2.1
+  environment:
+    JVM_OPTS: -Xms128m -Xmx512m
+  ports:
+    - 7000 # cluster
+    - 9042 # native
+
 test:
   image: node:6.5.0-onbuild
   command: npm test
@@ -40,3 +48,4 @@ test:
     - mysql:mysql
     - postgres:postgres
     - cassandra:cassandra
+    - cassandra2x:cassandra2x
