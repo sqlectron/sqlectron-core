@@ -1,5 +1,5 @@
 {
-  "name": "sqlectron-core",
+  "name": "@armarti/sqlectron-core",
   "version": "8.0.0",
   "description": "sqlectron-core",
   "main": "lib/index.js",
@@ -40,7 +40,7 @@
     "pg": "git+https://github.com/maxcnunes/node-postgres.git#multiple-statements-v6.1.0",
     "portfinder": "^0.4.0",
     "sql-query-identifier": "^1.1.0",
-    "sqlite3": "^3.1.8",
+    "sqlite3": "^4.0.2",
     "ssh2": "^0.5.0",
     "uuid": "^3.0.0",
     "valida": "^2.0.0"
