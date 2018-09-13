@@ -41,5 +41,5 @@ npm test
 1. Duplicate an existing client that is the most similar to the new client (e.g. [postgresql](/src/db/clients/postgresql.js)). Then adapt the code for this new client with its own logic. But it MUST keep the same public API. The tests will help to ensure the API still the same.
 1. Include the new client into the [list of supported dbs](/src/db/clients/index.js).
 1. Ensure the [tests](/spec/db.spec.js) are passing. May require adapting the tests to handle any different input/output the new client might have from the other clients.
-1. [Link](https://github.com/sqlectron/sqlectron-gui/blob/master/docs/development/test-core-changes.md) sqlectron-core to sqlectron-gui and test it in the app.
-1. Include a logo `server-db-client-<client_name>.png` into the [app](https://github.com/sqlectron/sqlectron-gui/tree/master/src/renderer/components).
+1. [Link](https://github.com/armarti/sqlectron-gui/blob/master/docs/development/test-core-changes.md) sqlectron-core to sqlectron-gui and test it in the app.
+1. Include a logo `server-db-client-<client_name>.png` into the [app](https://github.com/armarti/sqlectron-gui/tree/master/src/renderer/components).

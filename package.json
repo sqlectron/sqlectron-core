@@ -1,9 +1,19 @@
 {
-  "name": "@armarti/sqlectron-core",
-  "version": "8.0.0",
-  "description": "sqlectron-core",
+  "name": "@armarti/unified-dataloader-term-core",
+  "version": "0.0.1",
+  "license": "GPL-3.0-only",
+  "description": "@armarti/unified-dataloader-core",
+  "author": "Armarti Industries",
+  "contributors": [
+    "David Charles Morse <dcmorse@armarti.com>",
+    "The SQLECTRON Team"
+  ],
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/armarti/unified-dataloader-core"
+  },
   "main": "lib/index.js",
-  "author": "The SQLECTRON Team",
   "scripts": {
     "compile": "babel -d lib/ src/",
     "watch": "babel --watch -d lib/ src/",
@@ -16,19 +26,6 @@
     "test:cassandra": "DB_CLIENTS=cassandra npm run test",
     "test": "npm run lint && mocha --timeout 40000 --compilers js:babel-core/register --reporter spec ./spec/**/*.spec.js",
     "watch-test": "npm run lint && mocha --compilers js:babel/register --watch --reporter spec ./spec/**/*.spec.js"
-  },
-  "keywords": [
-    "sqlectron",
-    "sql",
-    "postgres",
-    "mysql"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/sqlectron/sqlectron-core"
-  },
-  "engines": {
-    "node": ">=6"
   },
   "dependencies": {
     "cassandra-driver": "^3.1.1",
@@ -62,5 +59,8 @@
     "mocha": "^3.0.2",
     "sinon": "^1.17.2",
     "sqlite3": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=6"
   }
 }

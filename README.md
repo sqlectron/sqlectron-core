@@ -14,7 +14,7 @@ It is pronounced "sequelectron" - https://translate.google.com/?source=osdd#en/e
 * [PostgreSQL](http://www.postgresql.org/)
 * [MySQL](https://www.mysql.com/)
 * [Microsoft SQL Server](http://www.microsoft.com/en-us/server-cloud/products/sql-server/)
-* [Cassandra](http://cassandra.apache.org/) (NoSQL; [Exceptions about this client](https://github.com/sqlectron/sqlectron-core/releases/tag/v6.3.0))
+* [Cassandra](http://cassandra.apache.org/) (NoSQL; [Exceptions about this client](https://github.com/armarti/sqlectron-core/releases/tag/v6.3.0))
 * [SQLite](https://sqlite.org/)
 
 Do you want to support another SQL database? Please follow [these steps](/CONTRIBUTING.md#adding-a-new-client).
