@@ -1,14 +1,11 @@
-# sqlectron-core
+# unified-dataloader-core
+Fork of [sqlectron-core](https://github.com/sqlectron/sqlectron-core).
 
-[![Build status](https://ci.appveyor.com/api/projects/status/bdnpb06lu4sl0hwn/branch/master?svg=true)](https://ci.appveyor.com/project/maxcnunes/sqlectron-core/branch/master)
+---
 
-The common code used by all sqlectron clients.
+The common code used by all unified-dataloader clients.
 
 > Requires node 6 or higher.
-
-#### How to pronounce
-
-It is pronounced "sequelectron" - https://translate.google.com/?source=osdd#en/en/sequelectron
 
 #### Current supported databases
 * [PostgreSQL](http://www.postgresql.org/)
@@ -24,7 +21,7 @@ Do you want to support another SQL database? Please follow [these steps](/CONTRI
 Install via npm:
 
 ```bash
-$ npm install sqlectron-core --save
+$ npm install @armarti/unified-dataloader-core --save
 ```
 
 ## Configuration
@@ -115,3 +112,4 @@ Please check out it [here](/CONTRIBUTING.md).
 ## License
 
 Copyright (c) 2015 The SQLECTRON Team. This software is licensed under the [MIT License](http://raw.github.com/sqlectron/sqlectron-core/master/LICENSE).
+Copyright (c) 2018 Armarti Industries. This software is licensed under the [MIT GPLv3](http://raw.github.com/armarti/unified-dataloader-core/master/LICENSE).
