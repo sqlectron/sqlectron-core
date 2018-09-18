@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { config } from '../src';
-import { readJSONFile } from './../src/utils';
+import { readJSONFile } from '../src/utils';
 import utilsStub from './utils-stub';
 
 const cryptoSecret = 'CHK`Ya91Hs{me!^8ndwPPaPPxwQ}`';

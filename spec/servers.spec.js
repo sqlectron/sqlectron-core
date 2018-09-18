@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { servers } from '../src';
-import { readJSONFile } from './../src/utils';
-import * as crypto from './../src/crypto';
+import { readJSONFile } from '../src/utils';
+import * as crypto from '../src/crypto';
 import utilsStub from './utils-stub';
 
 const cryptoSecret = 'CHK`Ya91Hs{me!^8ndwPPaPPxwQ}`';
