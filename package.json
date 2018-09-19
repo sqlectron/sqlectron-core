@@ -28,14 +28,14 @@
     "watch-test": "yarn run lint && mocha --compilers js:babel/register --watch --reporter spec ./spec/**/*.spec.js"
   },
   "dependencies": {
-    "cassandra-driver": "^3.1.1",
+    "cassandra-driver": "^3.5.0",
     "debug": "^4.0.1",
     "env-paths": "^1.0.0",
     "mkdirp": "^0.5.1",
     "mssql": "^4.2.1",
-    "mysql": "^2.10.2",
+    "mysql": "^2.16.0",
     "pg": "git+https://github.com/maxcnunes/node-postgres.git#multiple-statements-v6.1.0",
-    "portfinder": "^0.4.0",
+    "portfinder": "^1.0.17",
     "sql-query-identifier": "^1.1.0",
     "sqlite3": "^4.0.1",
     "ssh2": "^0.6.1",
@@ -63,7 +63,7 @@
     "typescript": "^3.0.3"
   },
   "engines": {
-    "node": ">=6",
+    "node": ">=6 <10.2",
     "yarn": ">=1.0"
   }
 }
