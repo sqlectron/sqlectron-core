@@ -1,4 +1,8 @@
-import { Connection } from 'mssql';
+// import { Connection } from 'mssql';
+// import ConnectionPool from 'mssql';  // https://github.com/tediousjs/node-mssql#3x-to-4x-changes
+import { ConnectionPool } from 'mssql/tedious';
+
+
 import { identify } from 'sql-query-identifier';
 
 import { buildDatabseFilter, buildSchemaFilter } from './utils';
@@ -13,7 +17,7 @@ const mmsqlErrors = {
 
 export default async function (server, database) {
   const dbConfig = configDatabase(server, database);
-  logger().debug('create driver client for mmsql with config %j', dbConfig);
+  logger().debug('create driver client for mssql with config %j', dbConfig);
 
   const conn = { dbConfig };
 
@@ -45,7 +49,7 @@ export default async function (server, database) {
 
 
 export async function disconnect(conn) {
-  const connection = await new Connection(conn.dbConfig);
+  const connection = await new ConnectionPool(conn.dbConfig);
   connection.close();
 }
 
@@ -79,7 +83,7 @@ export function query(conn, queryText) {
 
           // Executing only non select queries will not return results.
           // So we "fake" there is at least one result.
-          const results = !data.length && request.rowsAffected ? [[]] : data;
+          const results = !data.recordset.length && request.rowsAffected ? [[]] : data.recordset;
 
           return results.map((_, idx) => parseRowQueryResult(results[idx], request, commands[idx]));
         } catch (err) {
@@ -110,9 +114,9 @@ export async function executeQuery(conn, queryText) {
 
   // Executing only non select queries will not return results.
   // So we "fake" there is at least one result.
-  const results = !data.length && request.rowsAffected ? [[]] : data;
+  const results = !data.recordset.length && request.rowsAffected ? [[]] : data;
 
-  return results.map((_, idx) => parseRowQueryResult(results[idx], request, commands[idx]));
+  return results.recordset.map((_, idx) => parseRowQueryResult(results[idx], request, commands[idx]));
 }
 
 
@@ -121,7 +125,7 @@ async function getSchema(conn) {
 
   const { data } = await driverExecuteQuery(conn, { query: sql });
 
-  return data[0].schema;
+  return data.recordset[0].schema;
 }
 
 
@@ -139,7 +143,7 @@ export async function listTables(conn, filter) {
 
   const { data } = await driverExecuteQuery(conn, { query: sql });
 
-  return data.map((item) => ({
+  return data.recordset.map((item) => ({
     schema: item.table_schema,
     name: item.table_name,
   }));
@@ -158,7 +162,7 @@ export async function listViews(conn, filter) {
 
   const { data } = await driverExecuteQuery(conn, { query: sql });
 
-  return data.map((item) => ({
+  return data.recordsets.map((item) => ({
     schema: item.table_schema,
     name: item.table_name,
   }));
@@ -179,7 +183,7 @@ export async function listRoutines(conn, filter) {
 
   const { data } = await driverExecuteQuery(conn, { query: sql });
 
-  return data.map((row) => ({
+  return data.recordset.map((row) => ({
     schema: row.routine_schema,
     routineName: row.routine_name,
     routineType: row.routine_type,
@@ -195,7 +199,7 @@ export async function listTableColumns(conn, database, table) {
 
   const { data } = await driverExecuteQuery(conn, { query: sql });
 
-  return data.map((row) => ({
+  return data.recordset.map((row) => ({
     columnName: row.column_name,
     dataType: row.data_type,
   }));
@@ -208,7 +212,7 @@ export async function listTableTriggers(conn, table) {
 
   const { data } = await driverExecuteQuery(conn, { query: sql });
 
-  return data.map((row) => row.trigger_name);
+  return data.recordset.map((row) => row.trigger_name);
 }
 
 export async function listTableIndexes(conn, database, table) {
@@ -218,7 +222,7 @@ export async function listTableIndexes(conn, database, table) {
 
   const { data } = await driverExecuteQuery(conn, { query: sql });
 
-  return data.map((row) => row.index_name);
+  return data.recordset.map((row) => row.index_name);
 }
 
 export async function listSchemas(conn, filter) {
@@ -232,7 +236,7 @@ export async function listSchemas(conn, filter) {
 
   const { data } = await driverExecuteQuery(conn, { query: sql });
 
-  return data.map((row) => row.schema_name);
+  return data.recordset.map((row) => row.schema_name);
 }
 
 export async function listDatabases(conn, filter) {
@@ -246,7 +250,7 @@ export async function listDatabases(conn, filter) {
 
   const { data } = await driverExecuteQuery(conn, { query: sql });
 
-  return data.map((row) => row.name);
+  return data.recordset.map((row) => row.name);
 }
 
 export async function getTableReferences(conn, table) {
@@ -258,7 +262,7 @@ export async function getTableReferences(conn, table) {
 
   const { data } = await driverExecuteQuery(conn, { query: sql });
 
-  return data.map((row) => row.referenced_table_name);
+  return data.recordset.map((row) => row.referenced_table_name);
 }
 
 export async function getTableKeys(conn, database, table) {
@@ -281,7 +285,7 @@ export async function getTableKeys(conn, database, table) {
 
   const { data } = await driverExecuteQuery(conn, { query: sql });
 
-  return data.map((row) => ({
+  return data.recordset.map((row) => ({
     constraintName: row.constraint_name,
     columnName: row.column_name,
     referencedTable: row.referenced_table_name,
@@ -357,7 +361,7 @@ export async function getTableCreateScript(conn, table) {
 
   const { data } = await driverExecuteQuery(conn, { query: sql });
 
-  return data.map((row) => row.createtable);
+  return data.recordset.map((row) => row.createtable);
 }
 
 export async function getViewCreateScript(conn, view) {
@@ -365,7 +369,7 @@ export async function getViewCreateScript(conn, view) {
 
   const { data } = await driverExecuteQuery(conn, { query: sql });
 
-  return data.map((row) => row.ViewDefinition);
+  return data.recordset.map((row) => row.ViewDefinition);
 }
 
 export async function getRoutineCreateScript(conn, routine) {
@@ -377,7 +381,7 @@ export async function getRoutineCreateScript(conn, routine) {
 
   const { data } = await driverExecuteQuery(conn, { query: sql });
 
-  return data.map((row) => row.routine_definition);
+  return data.recordset.map((row) => row.routine_definition);
 }
 
 export async function truncateAllTables(conn) {
@@ -394,7 +398,7 @@ export async function truncateAllTables(conn) {
 
     const { data } = await driverExecuteQuery(connClient, { query: sql });
 
-    const truncateAll = data.map((row) => `
+    const truncateAll = data.recordset.map((row) => `
       DELETE FROM ${wrapIdentifier(schema)}.${wrapIdentifier(row.table_name)}
       DBCC CHECKIDENT ('${schema}.${row.table_name}', RESEED, 0);
     `).join('');
@@ -437,9 +441,9 @@ function parseRowQueryResult(data, request, command) {
 
   return {
     command: command || (isSelect && 'SELECT'),
-    rows: data,
-    fields: Object.keys(data[0] || {}).map((name) => ({ name })),
-    rowCount: data.length,
+    rows: data.recordset,
+    fields: Object.keys(data.recordset[0] || {}).map((name) => ({ name })),
+    rowCount: data.recordset.length,
     affectedRows: request.rowsAffected,
   };
 }
@@ -472,7 +476,7 @@ export async function driverExecuteQuery(conn, queryArgs) {
 }
 
 async function runWithConnection(conn, run) {
-  const connection = await new Connection(conn.dbConfig).connect();
+  const connection = await new ConnectionPool(conn.dbConfig).connect();
 
   return run(connection);
 }

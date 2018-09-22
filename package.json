@@ -15,8 +15,8 @@
   },
   "main": "lib/index.js",
   "scripts": {
-    "compile": "babel -d lib/ src/",
-    "watch": "babel --watch -d lib/ src/",
+    "compile": "rimraf lib && babel -d lib/ src/",
+    "watch": "rimraf lib && babel --source-maps=both --watch -d lib/ src/",
     "prepublish": "yarn run compile",
     "lint": "eslint src/ spec/",
     "test:mysql": "DB_CLIENTS=mysql yarn run test",
@@ -36,6 +36,7 @@
     "mysql": "^2.16.0",
     "pg": "git+https://github.com/maxcnunes/node-postgres.git#multiple-statements-v6.1.0",
     "portfinder": "^1.0.17",
+    "rimraf": "^2.6.2",
     "sql-query-identifier": "^1.1.0",
     "sqlite3": "^4.0.1",
     "ssh2": "^0.6.1",

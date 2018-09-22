@@ -2,5 +2,5 @@ build/
 dist/
 vendor/
 out/
-.sqlectron-gui.archive/
-.sqlectron-gui.archive/
+.archive/
+lib/

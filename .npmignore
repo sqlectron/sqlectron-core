@@ -1,5 +1,5 @@
 src/
 *.ts
 yarn.lock
-.sqlectron-gui.archive/
+.archive/
 /yarn-error.log
