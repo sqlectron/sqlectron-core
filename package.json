@@ -13,10 +13,14 @@
     "type": "git",
     "url": "https://github.com/armarti/unified-dataloader-core"
   },
+  "//": [
+    "TODO: Change \"main\" key to point to lib",
+    "main-src/index.js"
+  ],
   "main": "lib/index.js",
   "scripts": {
     "compile": "rimraf lib && babel -d lib/ src/",
-    "watch": "rimraf lib && babel --source-maps=both --watch -d lib/ src/",
+    "watch": "rimraf lib && node --inspect-port=9224 node_modules/.bin/babel --source-maps=both --watch -d lib/ src/",
     "prepublish": "yarn run compile",
     "lint": "eslint src/ spec/",
     "test:mysql": "DB_CLIENTS=mysql yarn run test",

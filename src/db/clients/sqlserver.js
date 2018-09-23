@@ -10,7 +10,7 @@ import createLogger from '../../logger';
 
 const logger = createLogger('db:clients:sqlserver');
 
-const mmsqlErrors = {
+const mssqlErrors = {
   CANCELED: 'ECANCEL',
 };
 
@@ -83,11 +83,11 @@ export function query(conn, queryText) {
 
           // Executing only non select queries will not return results.
           // So we "fake" there is at least one result.
-          const results = !data.recordset.length && request.rowsAffected ? [[]] : data.recordset;
+          const results = (!data.recordsets.length && request.rowsAffected) ? [[]] : data.recordsets;
 
           return results.map((_, idx) => parseRowQueryResult(results[idx], request, commands[idx]));
         } catch (err) {
-          if (err.code === mmsqlErrors.CANCELED) {
+          if (err.code === mssqlErrors.CANCELED) {
             err.sqlectronError = 'CANCELED_BY_USER';
           }
 
@@ -162,7 +162,7 @@ export async function listViews(conn, filter) {
 
   const { data } = await driverExecuteQuery(conn, { query: sql });
 
-  return data.recordsets.map((item) => ({
+  return data.recordset.map((item) => ({
     schema: item.table_schema,
     name: item.table_name,
   }));
@@ -441,9 +441,9 @@ function parseRowQueryResult(data, request, command) {
 
   return {
     command: command || (isSelect && 'SELECT'),
-    rows: data.recordset,
-    fields: Object.keys(data.recordset[0] || {}).map((name) => ({ name })),
-    rowCount: data.recordset.length,
+    rows: data,
+    fields: Object.keys(data[0] || {}).map((name) => ({ name })),
+    rowCount: data.length,
     affectedRows: request.rowsAffected,
   };
 }
