@@ -41,7 +41,8 @@ export default function (serverInfo) {
             }
             server.emit('success');
             conn.pipe(sshStream).pipe(conn);
-          });
+          }
+        );
       });
 
       try {

@@ -5,3 +5,5 @@ npm-debug.log
 lib
 spec/fixtures/.tmp.sqlectron.json
 sqlectron.db
+yarn.lock
+/yarn-error.log
