@@ -32,6 +32,7 @@
     "no-restricted-syntax": 1,
     "space-before-function-paren": 1,
     "operator-linebreak": 1,
-    "prefer-arrow-callback": 1
+    "prefer-arrow-callback": 1,
+    "import/no-useless-path-segments": 0
   }
 }
