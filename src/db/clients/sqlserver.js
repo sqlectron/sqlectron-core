@@ -1,10 +1,6 @@
-// import { Connection } from 'mssql';
-// import ConnectionPool from 'mssql';  // https://github.com/tediousjs/node-mssql#3x-to-4x-changes
+// https://github.com/tediousjs/node-mssql#3x-to-4x-changes
 import { ConnectionPool } from 'mssql/tedious';
-
-
 import { identify } from 'sql-query-identifier';
-
 import { buildDatabseFilter, buildSchemaFilter } from './utils';
 import createLogger from '../../logger';
 
