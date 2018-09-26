@@ -2,5 +2,4 @@ build/
 dist/
 vendor/
 out/
-.archive/
 lib/

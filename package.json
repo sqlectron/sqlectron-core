@@ -1,38 +1,38 @@
 {
-  "name": "@armarti/unified-dataloader-core",
-  "version": "0.0.5",
-  "license": "GPL-3.0-only",
-  "description": "@armarti/unified-dataloader-core",
-  "author": "Armarti Industries",
-  "contributors": [
-    "David Charles Morse <dcmorse@armarti.com>",
-    "The SQLECTRON Team"
+  "name": "sqlectron-core",
+  "version": "8.0.0",
+  "description": "sqlectron-core",
+  "main": "lib/index.js",
+  "author": "The SQLECTRON Team",
+  "scripts": {
+    "compile": "babel -d lib/ src/",
+    "watch": "babel --watch -d lib/ src/",
+    "prepublish": "npm run compile",
+    "lint": "eslint src/ spec/",
+    "test:mysql": "DB_CLIENTS=mysql npm run test",
+    "test:sqlite": "DB_CLIENTS=sqlite npm run test",
+    "test:sqlserver": "DB_CLIENTS=sqlserver npm run test",
+    "test:postgresql": "DB_CLIENTS=postgresql npm run test",
+    "test:cassandra": "DB_CLIENTS=cassandra npm run test",
+    "start": "npm run watch-test",
+    "test": "npm run lint && mocha --timeout 40000 --compilers js:@babel/register --reporter spec ./spec/**/*.spec.js",
+    "watch-test": "npm run lint && mocha --compilers js:@babel/register --watch --reporter spec ./spec/**/*.spec.js"
+  },
+  "keywords": [
+    "sqlectron",
+    "sql",
+    "postgres",
+    "mysql"
   ],
-  "keywords": [],
   "repository": {
     "type": "git",
-    "url": "https://github.com/armarti/unified-dataloader-core"
+    "url": "https://github.com/sqlectron/sqlectron-core"
   },
-  "//": [
-    "TODO: Change \"main\" key to point to lib",
-    "main-src/index.js"
-  ],
-  "main": "lib/index.js",
-  "scripts": {
-    "compile": "rimraf lib && babel -d lib/ src/",
-    "watch": "rimraf lib && node --inspect-port=9224 node_modules/.bin/babel --source-maps=both --watch -d lib/ src/",
-    "prepublish": "yarn run compile",
-    "lint": "eslint src/ spec/",
-    "test:mysql": "DB_CLIENTS=mysql yarn run test",
-    "test:sqlite": "DB_CLIENTS=sqlite yarn run test",
-    "test:sqlserver": "DB_CLIENTS=sqlserver yarn run test",
-    "test:postgresql": "DB_CLIENTS=postgresql yarn run test",
-    "test:cassandra": "DB_CLIENTS=cassandra yarn run test",
-    "test": "yarn run lint && mocha --timeout 40000 --compilers js:@babel/register --reporter spec ./spec/**/*.spec.js",
-    "watch-test": "yarn run lint && mocha --compilers js:babel/register --watch --reporter spec ./spec/**/*.spec.js"
+  "engines": {
+    "node": ">=6 <10.2"
   },
   "dependencies": {
-    "cassandra-driver": "^3.5.0",
+    "cassandra-driver": "^3.1.1",
     "debug": "^4.0.1",
     "env-paths": "^1.0.0",
     "mkdirp": "^0.5.1",
@@ -55,6 +55,7 @@
     "@babel/plugin-transform-async-to-generator": "^7.0.0",
     "@babel/plugin-transform-destructuring": "^7.0.0",
     "@babel/plugin-transform-modules-commonjs": "^7.0.0",
+    "@babel/register": "^7.0.0",
     "babel-eslint": "^9.0.0",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
@@ -63,12 +64,6 @@
     "eslint-plugin-babel": "^3.3.0",
     "eslint-plugin-import": "^2.14.0",
     "mocha": "^3.0.2",
-    "sinon": "^1.17.2",
-    "tslint": "^5.11.0",
-    "typescript": "^3.0.3"
-  },
-  "engines": {
-    "node": ">=6 <10.2",
-    "yarn": ">=1.0"
+    "sinon": "^1.17.2"
   }
 }
