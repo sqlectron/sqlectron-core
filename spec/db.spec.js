@@ -613,7 +613,7 @@ describe('db', () => {
                 }
 
                 try {
-                  expect(error).to.exists;
+                  expect(error).to.exist;
                   expect(error.sqlectronError).to.eql('CANCELED_BY_USER');
                   done();
                 } catch (err) {

@@ -1,6 +1,6 @@
 {
-  "name": "@armarti/sqlectron-core",
-  "version": "8.0.1",
+  "name": "@armarti/unified-dataloader-core",
+  "version": "0.0.5",
   "description": "sqlectron-core",
   "main": "lib/index.js",
   "author": "The SQLECTRON Team",
@@ -32,7 +32,7 @@
     "node": ">=6 <10.2"
   },
   "dependencies": {
-    "cassandra-driver": "^3.1.1",
+    "cassandra-driver": "^3.5.0",
     "debug": "^4.0.1",
     "env-paths": "^1.0.0",
     "mkdirp": "^0.5.1",
