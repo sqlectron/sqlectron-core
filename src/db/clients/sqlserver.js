@@ -110,9 +110,9 @@ export async function executeQuery(conn, queryText) {
 
   // Executing only non select queries will not return results.
   // So we "fake" there is at least one result.
-  const results = !data.recordset.length && request.rowsAffected ? [[]] : data;
+  const results = !data.recordsets.length && request.rowsAffected ? [[]] : data.recordsets;
 
-  return results.recordset.map((_, idx) => parseRowQueryResult(results[idx], request, commands[idx]));
+  return results.map((_, idx) => parseRowQueryResult(results[idx], request, commands[idx]));
 }
 
 
