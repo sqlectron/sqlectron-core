@@ -1,1 +1,5 @@
 src/
+*.ts
+yarn.lock
+.archive/
+/yarn-error.log

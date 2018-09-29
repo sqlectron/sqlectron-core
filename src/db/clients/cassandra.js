@@ -94,12 +94,12 @@ export function listTableColumns(client, database, table) {
       if (err) return reject(err);
       resolve(
         data.rows
-        // force pks be placed at the results beginning
-        .sort((a, b) => b.position - a.position)
-        .map((row) => ({
-          columnName: row.column_name,
-          dataType: row.type,
-        }))
+          // force pks be placed at the results beginning
+          .sort((a, b) => b.position - a.position)
+          .map((row) => ({
+            columnName: row.column_name,
+            dataType: row.type,
+          }))
       );
     });
   });

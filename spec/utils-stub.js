@@ -1,6 +1,6 @@
 import { join } from 'path';
 import { stub } from 'sinon';
-import * as utils from '../src/utils';
+import * as utils from './../src/utils';
 
 
 const FIXTURE_PATH = join(__dirname, './fixtures/.sqlectron.json');

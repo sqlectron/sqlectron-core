@@ -14,8 +14,9 @@
     "test:sqlserver": "DB_CLIENTS=sqlserver npm run test",
     "test:postgresql": "DB_CLIENTS=postgresql npm run test",
     "test:cassandra": "DB_CLIENTS=cassandra npm run test",
-    "test": "npm run lint && mocha --timeout 40000 --compilers js:babel-core/register --reporter spec ./spec/**/*.spec.js",
-    "watch-test": "npm run lint && mocha --compilers js:babel/register --watch --reporter spec ./spec/**/*.spec.js"
+    "start": "npm run watch-test",
+    "test": "npm run lint && mocha --timeout 40000 --compilers js:@babel/register --reporter spec ./spec/**/*.spec.js",
+    "watch-test": "npm run lint && mocha --compilers js:@babel/register --watch --reporter spec ./spec/**/*.spec.js"
   },
   "keywords": [
     "sqlectron",
@@ -28,39 +29,41 @@
     "url": "https://github.com/sqlectron/sqlectron-core"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=6 <10.2"
   },
   "dependencies": {
-    "cassandra-driver": "^3.1.1",
-    "debug": "^2.2.0",
+    "cassandra-driver": "^3.5.0",
+    "debug": "^4.0.1",
     "env-paths": "^1.0.0",
     "mkdirp": "^0.5.1",
-    "mssql": "^3.0.0",
-    "mysql": "^2.10.2",
+    "mssql": "^4.2.1",
+    "mysql": "^2.16.0",
     "pg": "git+https://github.com/maxcnunes/node-postgres.git#multiple-statements-v6.1.0",
-    "portfinder": "^0.4.0",
+    "portfinder": "^1.0.17",
+    "rimraf": "^2.6.2",
     "sql-query-identifier": "^1.1.0",
-    "sqlite3": "^3.1.8",
-    "ssh2": "^0.5.0",
-    "uuid": "^3.0.0",
-    "valida": "^2.0.0"
+    "sqlite3": "^4.0.1",
+    "ssh2": "^0.6.1",
+    "uuid": "^3.3.2",
+    "valida": "^2.4.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.14.0",
-    "babel-eslint": "^6.1.2",
-    "babel-plugin-syntax-object-rest-spread": "^6.13.0",
-    "babel-plugin-transform-async-to-generator": "^6.8.0",
-    "babel-plugin-transform-es2015-destructuring": "^6.9.0",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.14.0",
-    "babel-plugin-transform-object-rest-spread": "^6.8.0",
-    "chai": "^3.5.0",
-    "chai-as-promised": "^5.3.0",
-    "eslint": "^3.5.0",
-    "eslint-config-airbnb-base": "^7.1.0",
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.1",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
+    "@babel/plugin-syntax-object-rest-spread": "^7.0.0",
+    "@babel/plugin-transform-async-to-generator": "^7.0.0",
+    "@babel/plugin-transform-destructuring": "^7.0.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.0.0",
+    "@babel/register": "^7.0.0",
+    "babel-eslint": "^9.0.0",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-babel": "^3.3.0",
-    "eslint-plugin-import": "^1.15.0",
+    "eslint-plugin-import": "^2.14.0",
     "mocha": "^3.0.2",
-    "sinon": "^1.17.2",
-    "sqlite3": "^3.1.0"
+    "sinon": "^1.17.2"
   }
 }

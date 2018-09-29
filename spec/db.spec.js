@@ -1,6 +1,6 @@
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { db } from '../src';
+import { db } from './../src';
 import config from './databases/config';
 import setupSQLite from './databases/sqlite/setup';
 import setupCassandra from './databases/cassandra/setup';
@@ -613,7 +613,7 @@ describe('db', () => {
                 }
 
                 try {
-                  expect(error).to.exists;
+                  expect(error).to.exist;
                   expect(error.sqlectronError).to.eql('CANCELED_BY_USER');
                   done();
                 } catch (err) {
