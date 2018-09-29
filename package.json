@@ -1,6 +1,6 @@
 {
-  "name": "@armarti/unified-dataloader-core",
-  "version": "0.0.5",
+  "name": "sqlectron-core",
+  "version": "8.0.0",
   "description": "sqlectron-core",
   "main": "lib/index.js",
   "author": "The SQLECTRON Team",
