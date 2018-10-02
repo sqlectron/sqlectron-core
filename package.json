@@ -40,7 +40,6 @@
     "pg": "git+https://github.com/maxcnunes/node-postgres.git#multiple-statements-v6.1.0",
     "portfinder": "^0.4.0",
     "sql-query-identifier": "^1.1.0",
-    "sqlite3": "^3.1.8",
     "ssh2": "^0.5.0",
     "uuid": "^3.0.0",
     "valida": "^2.0.0"
@@ -61,6 +60,6 @@
     "eslint-plugin-import": "^1.15.0",
     "mocha": "^3.0.2",
     "sinon": "^1.17.2",
-    "sqlite3": "^3.1.0"
+    "sqlite3": "^4.0.2"
   }
 }
