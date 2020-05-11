@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { homedir } from 'os';
 import path from 'path';
 import mkdirp from 'mkdirp';
 import pf from 'portfinder';
@@ -22,11 +23,6 @@ export function getConfigPath() {
   }
 
   return configPath;
-}
-
-
-export function homedir() {
-  return process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
 }
 
 
