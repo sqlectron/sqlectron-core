@@ -191,6 +191,7 @@ export async function listTableColumns(conn, database, table) {
     SELECT column_name, data_type
     FROM information_schema.columns
     WHERE table_name = '${table}'
+    ORDER BY ordinal_position
   `;
 
   const { data } = await driverExecuteQuery(conn, { query: sql });
