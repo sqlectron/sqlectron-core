@@ -5,27 +5,24 @@
     "node": true,
     "mocha": true
   },
-  "plugins": [
-    "babel"
-  ],
   "rules": {
-    "generator-star-spacing": 0,
-    "babel/generator-star-spacing": 1,
+    "generator-star-spacing": ["warn", {"before": true, "after": false}],
 
     "no-use-before-define": 0,
 
-    "arrow-parens": 0,
-    "babel/arrow-parens": 2,
+    "arrow-parens": ["error", "always"],
 
     "consistent-return": 0,
 
     "no-bitwise": ["error", { "allow": ["~"] }],
     "import/no-extraneous-dependencies": [
-      "error", {
-      "devDependencies": true,
-      "optionalDependencies": true,
-      "peerDependencies": false
-    }],
+      "error",
+      {
+        "devDependencies": true,
+        "optionalDependencies": true,
+        "peerDependencies": false
+      }
+    ],
 
     "import/prefer-default-export": 0
   }

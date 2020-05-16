@@ -89,7 +89,7 @@ export function readJSONFileSync(filename) {
 
 export function createParentDirectory(filename) {
   return new Promise((resolve, reject) =>
-    (mkdirp(path.dirname(filename), (err) => (err ? reject(err) : resolve())))
+    (mkdirp(path.dirname(filename), (err) => (err ? reject(err) : resolve()))),
   );
 }
 
@@ -125,6 +125,7 @@ export function createCancelablePromise(error, timeIdle = 100) {
   return {
     async wait() {
       while (!canceled && !discarded) {
+        // eslint-disable-next-line
         await wait(timeIdle);
       }
 
