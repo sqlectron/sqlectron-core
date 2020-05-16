@@ -32,7 +32,6 @@
     "node": ">=6"
   },
   "dependencies": {
-    "@sinonjs/formatio": "^3.1.0",
     "cassandra-driver": "^3.1.1",
     "debug": "^2.2.0",
     "env-paths": "^1.0.0",
