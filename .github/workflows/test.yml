@@ -12,7 +12,23 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [6.x, 8.x, 10.x]  # to add: 12.x
+        include:
+          - node-version: 6.x
+            mysql-version: 5.7
+            cassandra-version: 3.7
+            postgres-version: 9
+          - node-version: 8.x
+            mysql-version: 5.7
+            cassandra-version: 3.7
+            postgres-version: 9
+          - node-version: 10.x
+            mysql-version: 5.7
+            cassandra-version: 3.7
+            postgres-version: 9
+          - node-version: 10.x
+            mysql-version: 8
+            cassandra-version: 3.7
+            postgres-version: 12
 
     env:
       CASSANDRA_PORT: tcp://localhost:9042
@@ -37,11 +53,11 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Create MySQL Container
-      run: docker run --rm -d --name mysql -e "MYSQL_ROOT_PASSWORD=Password12!" -e "MYSQL_DATABASE=sqlectron" -p 3306:3306 -v ${GITHUB_WORKSPACE}/spec/databases/mysql/schema:/docker-entrypoint-initdb.d mysql:5
+      run: docker run --rm -d --name mysql -e "MYSQL_ROOT_PASSWORD=Password12!" -e "MYSQL_DATABASE=sqlectron" -p 3306:3306 -v ${GITHUB_WORKSPACE}/spec/databases/mysql/schema:/docker-entrypoint-initdb.d mysql:${{ matrix.mysql-version }}
     - name: Create Postgres Container
-      run: docker run --rm -d --name postgres -e "POSTGRES_PASSWORD=Password12!" -e "POSTGRES_DB=sqlectron" -p 5432:5432 -v ${GITHUB_WORKSPACE}/spec/databases/postgresql/schema:/docker-entrypoint-initdb.d postgres:9
+      run: docker run --rm -d --name postgres -e "POSTGRES_PASSWORD=Password12!" -e "POSTGRES_DB=sqlectron" -p 5432:5432 -v ${GITHUB_WORKSPACE}/spec/databases/postgresql/schema:/docker-entrypoint-initdb.d postgres:${{ matrix.postgres-version }}
     - name: Create Cassandra Container
-      run: docker run --rm -d --name cassandra -p 9042:9042 -v ${GITHUB_WORKSPACE}/spec/databases/cassandra/schema:/docker-entrypoint-initdb.d  cassandra:3.7
+      run: docker run --rm -d --name cassandra -p 9042:9042 -v ${GITHUB_WORKSPACE}/spec/databases/cassandra/schema:/docker-entrypoint-initdb.d  cassandra:${{ matrix.cassandra-version }}
     - name: Create SQLServer Container
       run: docker run --rm -d --name sqlserver -p 1433:1433 -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password12!" -v ${GITHUB_WORKSPACE}/spec/databases/sqlserver/schema:/docker-entrypoint-initdb.d mcr.microsoft.com/mssql/server:2017-latest
     - name: Use Node.js ${{ matrix.node-version }}
