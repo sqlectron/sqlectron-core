@@ -10,6 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       matrix:
         include:
@@ -17,18 +18,27 @@ jobs:
             mysql-version: 5.7
             cassandra-version: 3.7
             postgres-version: 9
+            experimental: false
           - node-version: 8.x
             mysql-version: 5.7
             cassandra-version: 3.7
             postgres-version: 9
+            experimental: false
           - node-version: 10.x
             mysql-version: 5.7
             cassandra-version: 3.7
             postgres-version: 9
+            experimental: false
           - node-version: 10.x
             mysql-version: 8
             cassandra-version: 3.7
             postgres-version: 12
+            experimental: true
+          - node-version: 12.x
+            mysql-version: 5.7
+            cassandra-version: 3.7
+            postgres-version: 9
+            experimental: true
 
     env:
       CASSANDRA_PORT: tcp://localhost:9042
