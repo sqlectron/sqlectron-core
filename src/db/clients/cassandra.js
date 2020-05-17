@@ -17,38 +17,46 @@ export default function (server, database) {
     const client = new cassandra.Client(dbConfig);
 
     logger().debug('connecting');
-    client.connect((err) => {
+    client.connect(async (err) => {
       if (err) {
         client.shutdown();
         return reject(err);
       }
 
-      logger().debug('connected');
-      resolve({
-        wrapIdentifier,
-        disconnect: () => disconnect(client),
-        listTables: (db) => listTables(client, db),
-        listViews: () => listViews(client),
-        listRoutines: () => listRoutines(client),
-        listTableColumns: (db, table) => listTableColumns(client, db, table),
-        listTableTriggers: (table) => listTableTriggers(client, table),
-        listTableIndexes: (db, table) => listTableIndexes(client, table),
-        listSchemas: () => listSchemas(client),
-        getTableReferences: (table) => getTableReferences(client, table),
-        getTableKeys: (db, table) => getTableKeys(client, db, table),
-        query: (queryText) => executeQuery(client, queryText),
-        executeQuery: (queryText) => executeQuery(client, queryText),
-        listDatabases: () => listDatabases(client),
-        getQuerySelectTop: (table, limit) => getQuerySelectTop(client, table, limit),
-        getTableCreateScript: (table) => getTableCreateScript(client, table),
-        getViewCreateScript: (view) => getViewCreateScript(client, view),
-        getRoutineCreateScript: (routine) => getRoutineCreateScript(client, routine),
-        truncateAllTables: (db) => truncateAllTables(client, db),
+      client.execute('SELECT cql_version FROM system.local;', (error, data) => {
+        if (error) {
+          client.shutdown();
+          return reject(error);
+        }
+        const version = data.rows[0].cql_version;
+
+        logger().debug('connected');
+        resolve({
+          wrapIdentifier,
+          version,
+          disconnect: () => disconnect(client),
+          listTables: (db) => listTables(client, db),
+          listViews: () => listViews(client),
+          listRoutines: () => listRoutines(client),
+          listTableColumns: (db, table) => listTableColumns(client, db, table),
+          listTableTriggers: (table) => listTableTriggers(client, table),
+          listTableIndexes: (db, table) => listTableIndexes(client, table),
+          listSchemas: () => listSchemas(client),
+          getTableReferences: (table) => getTableReferences(client, table),
+          getTableKeys: (db, table) => getTableKeys(client, db, table),
+          query: (queryText) => executeQuery(client, queryText),
+          executeQuery: (queryText) => executeQuery(client, queryText),
+          listDatabases: () => listDatabases(client),
+          getQuerySelectTop: (table, limit) => getQuerySelectTop(client, table, limit),
+          getTableCreateScript: (table) => getTableCreateScript(client, table),
+          getViewCreateScript: (view) => getViewCreateScript(client, view),
+          getRoutineCreateScript: (routine) => getRoutineCreateScript(client, routine),
+          truncateAllTables: (db) => truncateAllTables(client, db),
+        });
       });
     });
   });
 }
-
 
 export function disconnect(client) {
   client.shutdown();
