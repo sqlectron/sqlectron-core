@@ -99,7 +99,7 @@ export function listTableColumns(client, database, table) {
           .map((row) => ({
             columnName: row.column_name,
             dataType: row.type,
-          }))
+          })),
       );
     });
   });

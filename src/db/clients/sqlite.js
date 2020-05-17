@@ -283,7 +283,7 @@ export function driverExecuteQuery(conn, queryArgs) {
           ...result,
           statement,
         };
-      })
+      }),
     );
 
     return queryArgs.multiple ? results : results[0];
