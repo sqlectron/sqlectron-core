@@ -514,7 +514,7 @@ function parseRowQueryResult(data, command) {
     rows: data.rows,
     fields: data.fields,
     rowCount: isSelect ? (data.rowCount || data.rows.length) : undefined,
-    affectedRows: !isSelect && !isNaN(data.rowCount) ? data.rowCount : undefined,
+    affectedRows: !isSelect && !isNaN(data.rowCount) && data.rowCount !== null ? data.rowCount : undefined,
   };
 }
 
