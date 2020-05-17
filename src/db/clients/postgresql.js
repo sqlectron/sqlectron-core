@@ -127,6 +127,7 @@ export async function listTableColumns(conn, database, table, schema) {
     FROM information_schema.columns
     WHERE table_schema = $1
     AND table_name = $2
+    ORDER BY ordinal_position
   `;
 
   const params = [
@@ -314,11 +315,14 @@ export function query(conn, queryText) {
 
 
 export async function executeQuery(conn, queryText) {
-  const data = await driverExecuteQuery(conn, { query: queryText, multiple: true });
-
   const commands = identifyCommands(queryText).map((item) => item.type);
 
-  return data.map((result, idx) => parseRowQueryResult(result, commands[idx]));
+  let data = await driverExecuteQuery(conn, { query: queryText, multiple: true });
+  if (!Array.isArray(data)) {
+    data = [data];
+  }
+
+  return data.filter((result) => result.command !== null).map((result, idx) => parseRowQueryResult(result, commands[idx]));
 }
 
 
