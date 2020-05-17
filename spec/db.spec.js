@@ -137,7 +137,7 @@ describe('db', () => {
         }
 
         describe('.listRoutines', () => {
-          it('should list all routines with their type', async() => {
+          it('should list all routines with their type', async () => {
             const routines = await dbConn.listRoutines({ schema: dbSchema });
             const routine = dbClient === 'postgresql' ? routines[1] : routines[0];
 
@@ -165,7 +165,7 @@ describe('db', () => {
         });
 
         describe('.listTableColumns', () => {
-          it('should list all columns and their type from users table', async() => {
+          it('should list all columns and their type from users table', async () => {
             const columns = await dbConn.listTableColumns('users');
             expect(columns).to.have.length(6);
 
@@ -215,7 +215,7 @@ describe('db', () => {
         });
 
         describe('.listTableTriggers', () => {
-          it('should list all table related triggers', async() => {
+          it('should list all table related triggers', async () => {
             const triggers = await dbConn.listTableTriggers('users');
             if (dbClient === 'cassandra') {
               expect(triggers).to.have.length(0);
@@ -227,7 +227,7 @@ describe('db', () => {
         });
 
         describe('.listTableIndexes', () => {
-          it('should list all indexes', async() => {
+          it('should list all indexes', async () => {
             const indexes = await dbConn.listTableIndexes('users', dbSchema);
             if (dbClient === 'cassandra') {
               expect(indexes).to.have.length(0);
@@ -250,7 +250,7 @@ describe('db', () => {
         });
 
         describe('.listSchemas', () => {
-          it('should list all schema', async() => {
+          it('should list all schema', async () => {
             const schemas = await dbConn.listSchemas({ schema: { only: [dbSchema, 'dummy_schema'] } });
             if (dbClient === 'postgresql') {
               expect(schemas).to.have.length(2);
@@ -264,7 +264,7 @@ describe('db', () => {
         });
 
         describe('.getTableReferences', () => {
-          it('should list all tables that selected table has references to', async() => {
+          it('should list all tables that selected table has references to', async () => {
             const references = await dbConn.getTableReferences('users');
             if (dbClient === 'cassandra' || dbClient === 'sqlite') {
               expect(references).to.have.length(0);
@@ -276,7 +276,7 @@ describe('db', () => {
         });
 
         describe('.getTableKeys', () => {
-          it('should list all tables keys', async() => {
+          it('should list all tables keys', async () => {
             const tableKeys = await dbConn.getTableKeys('users');
             if (dbClient === 'cassandra') {
               expect(tableKeys).to.have.length(1);
@@ -300,7 +300,7 @@ describe('db', () => {
         });
 
         describe('.getTableCreateScript', () => {
-          it('should return table create script', async() => {
+          it('should return table create script', async () => {
             const [createScript] = await dbConn.getTableCreateScript('users');
 
             if (dbClient === 'mysql') {
@@ -325,7 +325,7 @@ describe('db', () => {
                 '  createdat date NULL\n' +
                 ');\n' +
                 '\n' +
-                'ALTER TABLE public.users ADD CONSTRAINT users_pkey PRIMARY KEY (id)'
+                'ALTER TABLE public.users ADD CONSTRAINT users_pkey PRIMARY KEY (id)',
               );
             } else if (dbClient === 'sqlserver') {
               expect(createScript).to.contain('CREATE TABLE users (\r\n' +
@@ -347,7 +347,7 @@ describe('db', () => {
                 '  role_id INT,\n' +
                 '  createdat DATETIME NULL,\n' +
                 '  PRIMARY KEY (id),\n' +
-                '  FOREIGN KEY (role_id) REFERENCES roles (id)\n)'
+                '  FOREIGN KEY (role_id) REFERENCES roles (id)\n)',
               );
             } else if (dbClient === 'cassandra') {
               expect(createScript).to.eql(undefined);
@@ -358,7 +358,7 @@ describe('db', () => {
         });
 
         describe('.getTableSelectScript', () => {
-          it('should return SELECT table script', async() => {
+          it('should return SELECT table script', async () => {
             const selectQuery = await dbConn.getTableSelectScript('users');
             if (dbClient === 'mysql') {
               expect(selectQuery).to.eql('SELECT `id`, `username`, `email`, `password`, `role_id`, `createdat` FROM `users`;');
@@ -373,7 +373,7 @@ describe('db', () => {
             }
           });
 
-          it('should return SELECT table script with schema if defined', async() => {
+          it('should return SELECT table script with schema if defined', async () => {
             const selectQuery = await dbConn.getTableSelectScript('users', 'public');
             if (dbClient === 'sqlserver') {
               expect(selectQuery).to.eql('SELECT [id], [username], [email], [password], [role_id], [createdat] FROM [public].[users];');
@@ -385,7 +385,7 @@ describe('db', () => {
 
 
         describe('.getTableInsertScript', () => {
-          it('should return INSERT INTO table script', async() => {
+          it('should return INSERT INTO table script', async () => {
             const insertQuery = await dbConn.getTableInsertScript('users');
             if (dbClient === 'mysql') {
               expect(insertQuery).to.eql([
@@ -412,7 +412,7 @@ describe('db', () => {
             }
           });
 
-          it('should return INSERT INTO table script with schema if defined', async() => {
+          it('should return INSERT INTO table script with schema if defined', async () => {
             const insertQuery = await dbConn.getTableInsertScript('users', 'public');
             if (dbClient === 'sqlserver') {
               expect(insertQuery).to.eql([
@@ -429,7 +429,7 @@ describe('db', () => {
         });
 
         describe('.getTableUpdateScript', () => {
-          it('should return UPDATE table script', async() => {
+          it('should return UPDATE table script', async () => {
             const updateQuery = await dbConn.getTableUpdateScript('users');
             if (dbClient === 'mysql') {
               expect(updateQuery).to.eql([
@@ -460,7 +460,7 @@ describe('db', () => {
             }
           });
 
-          it('should return UPDATE table script with schema if defined', async() => {
+          it('should return UPDATE table script with schema if defined', async () => {
             const updateQuery = await dbConn.getTableUpdateScript('users', 'public');
             if (dbClient === 'sqlserver') {
               expect(updateQuery).to.eql([
@@ -479,7 +479,7 @@ describe('db', () => {
         });
 
         describe('.getTableDeleteScript', () => {
-          it('should return table DELETE script', async() => {
+          it('should return table DELETE script', async () => {
             const deleteQuery = await dbConn.getTableDeleteScript('roles');
             if (dbClient === 'mysql') {
               expect(deleteQuery).to.contain('DELETE FROM `roles` WHERE <condition>;');
@@ -494,7 +494,7 @@ describe('db', () => {
             }
           });
 
-          it('should return table DELETE script with schema if defined', async() => {
+          it('should return table DELETE script with schema if defined', async () => {
             const deleteQuery = await dbConn.getTableDeleteScript('roles', 'public');
             if (dbClient === 'sqlserver') {
               expect(deleteQuery).to.contain('DELETE FROM [public].[roles] WHERE <condition>;');
@@ -505,7 +505,7 @@ describe('db', () => {
         });
 
         describe('.getViewCreateScript', () => {
-          it('should return CREATE VIEW script', async() => {
+          it('should return CREATE VIEW script', async () => {
             const [createScript] = await dbConn.getViewCreateScript('email_view');
 
             if (dbClient === 'mysql') {
@@ -542,7 +542,7 @@ describe('db', () => {
         });
 
         describe('.getRoutineCreateScript', () => {
-          it('should return CREATE PROCEDURE/FUNCTION script', async() => {
+          it('should return CREATE PROCEDURE/FUNCTION script', async () => {
             const [createScript] = await dbConn.getRoutineCreateScript('users_count', 'Procedure');
 
             if (dbClient === 'mysql') {

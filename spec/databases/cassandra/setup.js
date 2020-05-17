@@ -10,9 +10,11 @@ export default function run(config) {
     });
     const script = fs.readFileSync(path.join(__dirname, 'schema/schema.cql'), { encoding: 'utf8' });
     const queries = script.split(';').filter((query) => query.trim().length);
-    for (const query of queries) {
-      await executeQuery(client, query);
-    }
+    const promises = [];
+    queries.forEach((query) => {
+      promises.push(executeQuery(client, query));
+    });
+    await Promise.all(promises);
   });
 }
 
