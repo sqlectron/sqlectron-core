@@ -639,7 +639,14 @@ describe('db', () => {
             `);
           });
 
-          afterEach(() => dbConn.truncateAllTables());
+          afterEach(async () => {
+            // TODO: Fix truncateAllTables for SQLServer 2017
+            if (dbClient === 'sqlserver') {
+              await dbConn.executeQuery('DELETE FROM users');
+            }
+
+            await dbConn.truncateAllTables();
+          });
 
           describe('SELECT', () => {
             it('should execute an empty query', async () => {

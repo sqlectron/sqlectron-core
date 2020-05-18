@@ -1,0 +1,91 @@
+name: Test
+
+on:
+  push:
+    branches: [ '*' ]
+  pull_request:
+    branches: [ '*' ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - node-version: 6.x
+            mysql-version: 5.7
+            cassandra-version: 3.7
+            postgres-version: 9
+          - node-version: 8.x
+            mysql-version: 5.7
+            cassandra-version: 3.7
+            postgres-version: 9
+          - node-version: 10.x
+            mysql-version: 5.7
+            cassandra-version: 3.7
+            postgres-version: 9
+          - node-version: 10.x
+            mysql-version: 5.7
+            cassandra-version: 3.7
+            postgres-version: 9
+          - node-version: 12.x
+            mysql-version: 5.7
+            cassandra-version: 3.7
+            postgres-version: 9
+
+    env:
+      CASSANDRA_PORT: tcp://localhost:9042
+      POSTGRES_PORT: tcp://localhost:5432
+      POSTGRES_ENV_POSTGRES_USER: postgres
+      POSTGRES_ENV_POSTGRES_PASSWORD: Password12!
+      POSTGRES_ENV_POSTGRES_DB: sqlectron
+      PGUSER: postgres
+      PGPASSWORD: Password12!
+      MYSQL_PORT: tcp://localhost:3306
+      MYSQL_ENV_MYSQL_USER: root
+      MYSQL_ENV_MYSQL_PASSWORD: Password12!
+      MYSQL_ENV_MYSQL_DATABASE: sqlectron
+      MYSQL_PWD: Password12!
+      SQLSERVER_ENV_SQLSERVER_HOST: localhost
+      SQLSERVER_ENV_SQLSERVER_PORT: 1433
+      SQLSERVER_ENV_SQLSERVER_USER: sa
+      SQLSERVER_ENV_SQLSERVER_PASSWORD: Password12!
+      SQLSERVER_ENV_SQLSERVER_DATABASE: sqlectron
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Create MySQL Container
+      run: docker run --rm -d --name mysql -e "MYSQL_ROOT_PASSWORD=Password12!" -e "MYSQL_DATABASE=sqlectron" -p 3306:3306 -v ${GITHUB_WORKSPACE}/spec/databases/mysql/schema:/docker-entrypoint-initdb.d mysql:${{ matrix.mysql-version }}
+    - name: Create Postgres Container
+      run: docker run --rm -d --name postgres -e "POSTGRES_PASSWORD=Password12!" -e "POSTGRES_DB=sqlectron" -p 5432:5432 -v ${GITHUB_WORKSPACE}/spec/databases/postgresql/schema:/docker-entrypoint-initdb.d postgres:${{ matrix.postgres-version }}
+    - name: Create Cassandra Container
+      run: docker run --rm -d --name cassandra -p 9042:9042 -v ${GITHUB_WORKSPACE}/spec/databases/cassandra/schema:/docker-entrypoint-initdb.d  cassandra:${{ matrix.cassandra-version }}
+    - name: Create SQLServer Container
+      run: docker run --rm -d --name sqlserver -p 1433:1433 -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password12!" -v ${GITHUB_WORKSPACE}/spec/databases/sqlserver/schema:/docker-entrypoint-initdb.d mcr.microsoft.com/mssql/server:2017-latest
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm install -g npm
+
+    - run: npm ci
+      if: matrix.node-version != '12.x'
+
+    - run: npm ci --build-from-source
+      if: matrix.node-version == '12.x'
+
+    - run: npm run lint
+    - run: npm run compile
+
+    # Set-up containers that do not support initialization sequences
+    - name: Create Cassandra Schema
+      run: docker exec -i cassandra /bin/bash -c "until cqlsh -f /docker-entrypoint-initdb.d/schema.cql; do sleep 2; done"
+
+    - name: Create SQLServer Database
+      run: docker exec -i sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost,1433 -U sa -P Password12! -Q "CREATE DATABASE sqlectron" -d "master"
+    - name: Initialize SQLServer Schema
+      run: docker exec -i sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost,1433 -U sa -P Password12! -i /docker-entrypoint-initdb.d/schema.sql -d "sqlectron"
+
+    - run: DB_CLIENTS=mysql,postgresql,sqlite,sqlserver,cassandra npm run test
