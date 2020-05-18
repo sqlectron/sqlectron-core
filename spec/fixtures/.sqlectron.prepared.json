@@ -6,8 +6,14 @@
       "host": "10.10.10.10",
       "port": 5432,
       "user": "user",
-      "password": "password",
-      "database": "company"
+      "password": {
+        "ivText": "VxYLslGSBsBBqjOyQ0X6ew==",
+        "encryptedText": "bdt6D8klaflnB84ZlmrQ/A=="
+      },
+      "database": "company",
+      "id": "778871c1-644b-47a3-be48-7ff03f757b15",
+      "ssl": false,
+      "encrypted": true
     },
     {
       "id": "c94cbafa-8977-4142-9f34-c84d382d8731",
@@ -16,8 +22,13 @@
       "host": "10.10.10.10",
       "port": 5432,
       "user": "user",
-      "password": "password",
-      "database": "company"
+      "password": {
+        "ivText": "1XdXvHDbfshaB0dtGuTrhw==",
+        "encryptedText": "2NdqJ3VhgkpQXu13r/NNLQ=="
+      },
+      "database": "company",
+      "ssl": false,
+      "encrypted": true
     },
     {
       "id": "ed2d52a7-d8ff-4fdd-897a-7033dee598f4",
@@ -27,7 +38,12 @@
       "port": 3306,
       "database": "authentication",
       "user": "root",
-      "password": "password"
+      "password": {
+        "ivText": "gWBYRDpY0nWka8lJj26jpA==",
+        "encryptedText": "oTf0hz8r8waJkff65m3fQg=="
+      },
+      "ssl": false,
+      "encrypted": true
     },
     {
       "encrypted": true,
@@ -41,7 +57,8 @@
       "password": {
         "ivText": "wGf6X9T+QSygOHqtgQPlcA==",
         "encryptedText": "0LySDs9WPAvwSS9Qv+W3/A=="
-      }
+      },
+      "ssl": false
     },
     {
       "encrypted": true,
@@ -52,7 +69,11 @@
       "port": 3306,
       "database": "authentication",
       "user": "root",
-      "password": "fa1d88ee82bd4439"
+      "password": {
+        "ivText": "pNr8A2hS+S71TVbOuRaOCw==",
+        "encryptedText": "9/GqyCfHUL5OVZknFbg15Q=="
+      },
+      "ssl": false
     },
     {
       "encrypted": true,
@@ -63,13 +84,20 @@
       "port": 3306,
       "database": "authentication",
       "user": "root",
-      "password": "fa1d88ee82bd4439",
+      "password": {
+        "ivText": "WOspPYHPinofkZ3++nd81g==",
+        "encryptedText": "/9fmafWdKTTzI0hvw1blIw=="
+      },
       "ssh": {
         "host": "10.10.10.10",
         "port": 22,
         "user": "core",
-        "password": "fa1d88ee82bd4439"
-      }
+        "password": {
+          "ivText": "otimYaEFXULqybphtFyi3g==",
+          "encryptedText": "8VokUHFkXOCUboz5pLa3Eg=="
+        }
+      },
+      "ssl": false
     },
     {
       "id": "f7baa5f0-42a2-4f51-b49d-26cf3bfe8221",
@@ -78,14 +106,19 @@
       "host": "localhost",
       "port": 5432,
       "user": "user",
-      "password": "password",
+      "password": {
+        "ivText": "jYYw+h5626N4yKn/Fs0Qaw==",
+        "encryptedText": "or5P+1SwaI5axBIC8BDuqg=="
+      },
       "database": "company",
       "ssh": {
         "host": "10.10.10.10",
         "port": 22,
         "privateKey": "~/.vagrant.d/insecure_private_key",
         "user": "core"
-      }
+      },
+      "ssl": false,
+      "encrypted": true
     },
     {
       "id": "40c1fc90-8bc2-4e77-a458-4140f4e9b40f",
@@ -94,14 +127,22 @@
       "host": "host.com",
       "port": 33,
       "user": "user",
-      "password": "passd",
+      "password": {
+        "ivText": "4K3ENy67yu6TVMwsJy/jSw==",
+        "encryptedText": "Qugn60QGk8OjgojXqUoOgA=="
+      },
       "database": "database",
       "ssh": {
         "host": "hostssh.com",
         "port": 22,
         "user": "usrssh",
-        "password": "pwdssh"
-      }
+        "password": {
+          "ivText": "9aqZuWGrbaXBodPQ3mhj9A==",
+          "encryptedText": "aUDcWrMWZIoxKZ0sj8xosA=="
+        }
+      },
+      "ssl": false,
+      "encrypted": true
     },
     {
       "id": "961dfdfe-2697-4d02-b8a2-ee2b33e4c2a1",
@@ -110,14 +151,22 @@
       "host": "hsot.com",
       "port": 3,
       "user": "user",
-      "password": "pass",
+      "password": {
+        "ivText": "3Oa5m80FQ4Jy+XJez+bVMA==",
+        "encryptedText": "i4v3ZdDfpKh5BnzRrZgfzQ=="
+      },
       "database": "databa",
       "ssh": {
         "host": "hostssh.com",
         "port": 33,
         "user": "user",
-        "password": "pass"
-      }
+        "password": {
+          "ivText": "R95eRnIjQGRjbwuutTG8PQ==",
+          "encryptedText": "sUECh1SMhgKArMR3BNmb1w=="
+        }
+      },
+      "ssl": false,
+      "encrypted": true
     },
     {
       "id": "df8b16d3-6ad4-4582-a5fd-58d18b5b50ae",
@@ -140,6 +189,7 @@
           "encryptedText": "Z9TrH05/Csxl9xA/FgIVXw=="
         }
       },
+      "ssl": false,
       "encrypted": true
     },
     {
@@ -149,8 +199,13 @@
       "host": "host.com",
       "port": 33,
       "user": "user",
-      "password": "paas",
-      "database": "databse"
+      "password": {
+        "ivText": "BAf8Q8Txw00Lw6ZY9fSuvw==",
+        "encryptedText": "E4HVp2mjNBj/TnCrZ5mOsQ=="
+      },
+      "database": "databse",
+      "ssl": false,
+      "encrypted": true
     },
     {
       "id": "0108f534-c5fa-441f-b4a6-68eed18d4389",
@@ -159,8 +214,13 @@
       "host": "hsot.com",
       "port": 33,
       "user": "user",
-      "password": "pass",
-      "database": "database"
+      "password": {
+        "ivText": "CUyDTgMShky4OtKkjNoMiw==",
+        "encryptedText": "2uITYtE4GNVELLxQJyw13Q=="
+      },
+      "database": "database",
+      "ssl": false,
+      "encrypted": true
     },
     {
       "id": "da0d6685-3c95-4c69-b9b8-4611da412064",
@@ -169,8 +229,13 @@
       "host": "hot.com",
       "port": 34,
       "user": "user",
-      "password": "pass",
-      "database": "data"
+      "password": {
+        "ivText": "JxNlxysUP7T1FLlzs87/IA==",
+        "encryptedText": "XpIDARGkJ5PPMUv0sIOE6Q=="
+      },
+      "database": "data",
+      "ssl": false,
+      "encrypted": true
     },
     {
       "id": "bcd9b635-f6c5-4c22-b04b-a17f3f80b7b5",
@@ -179,8 +244,13 @@
       "host": "host.com",
       "port": 33434,
       "user": "use",
-      "password": "pass",
-      "database": "database"
+      "password": {
+        "ivText": "wsejsrTGr2gnqhAr81coNQ==",
+        "encryptedText": "Be05WVbJUdZ1UWpSgCm5Ng=="
+      },
+      "database": "database",
+      "ssl": false,
+      "encrypted": true
     },
     {
       "id": "623b39d6-39cb-4c0a-bf69-7f00b94768a9",
@@ -189,8 +259,13 @@
       "host": "host",
       "port": 334,
       "user": "user",
-      "password": "pass",
-      "database": "data"
+      "password": {
+        "ivText": "09bSLl1ezCe9HUpBEhyEdQ==",
+        "encryptedText": "yrd60sTuawQvsrXcTwRskA=="
+      },
+      "database": "data",
+      "ssl": false,
+      "encrypted": true
     },
     {
       "id": "0c60edd4-9795-422e-9ba4-b70cd703ae08",
@@ -199,8 +274,13 @@
       "host": "hsot.com",
       "port": 3434,
       "user": "user",
-      "password": "padad",
-      "database": "data"
+      "password": {
+        "ivText": "460tqPlo3B/2mDd+U/tekQ==",
+        "encryptedText": "BTQvJcoLBqiHTESQFha31w=="
+      },
+      "database": "data",
+      "ssl": false,
+      "encrypted": true
     }
   ]
 }

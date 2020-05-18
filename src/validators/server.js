@@ -45,6 +45,34 @@ function boolValidator(ctx, options, value) {
   }
 }
 
+function passwordSanitizer(ctx, options, value) {
+  if (value === undefined || value === null) {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    return Valida.sanitizers.trim(ctx, options, value);
+  }
+
+  return {
+    ivText: Valida.sanitizers.trim(ctx, options, value.ivText),
+    encryptedText: Valida.sanitizers.trim(ctx, options, value.encryptedText),
+  };
+}
+
+function passwordValidator(ctx, options, value) {
+  if (value === undefined || value === null) {
+    return;
+  }
+
+  if (typeof value === 'string') {
+    return Valida.validators.len(ctx, options, value);
+  }
+
+  return Valida.validators.len(ctx, options, value.ivText)
+    || Valida.validators.len(ctx, options, value.encryptedText);
+}
+
 
 const SSH_SCHEMA = {
   host: [
@@ -61,8 +89,8 @@ const SSH_SCHEMA = {
     { validator: Valida.Validator.len, min: 1 },
   ],
   password: [
-    { sanitizer: Valida.Sanitizer.trim },
-    { validator: Valida.Validator.len, min: 1 },
+    { sanitizer: passwordSanitizer },
+    { validator: passwordValidator, min: 1 },
   ],
   privateKey: [
     { sanitizer: Valida.Sanitizer.trim },
@@ -112,8 +140,8 @@ const SERVER_SCHEMA = {
     { validator: Valida.Validator.len, min: 1 },
   ],
   password: [
-    { sanitizer: Valida.Sanitizer.trim },
-    { validator: Valida.Validator.len, min: 1 },
+    { sanitizer: passwordSanitizer },
+    { validator: passwordValidator, min: 1 },
   ],
   ssh: [
     { validator: Valida.Validator.schema, schema: SSH_SCHEMA },

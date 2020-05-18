@@ -70,23 +70,30 @@ export async function removeById(id) {
 }
 
 // ensure all secret fields are encrypted
-function encryptSecrects(server, cryptoSecret, oldSever) {
+function encryptSecrects(server, cryptoSecret, oldServer) {
   const updatedServer = { ...server };
 
-  /* eslint no-param-reassign:0 */
   if (server.password) {
-    const isPassDiff = (oldSever && server.password !== oldSever.password);
+    if (oldServer && oldServer.password && typeof oldServer.password === 'string' && oldServer.encrypted) {
+      if (server.password === oldServer.password) {
+        updatedServer.password = crypto.unsafeDecrypt(oldServer.password, cryptoSecret);
+      }
+    }
 
-    if (!oldSever || isPassDiff) {
-      updatedServer.password = crypto.encrypt(server.password, cryptoSecret);
+    if (typeof updatedServer.password === 'string') {
+      updatedServer.password = crypto.encrypt(updatedServer.password, cryptoSecret);
     }
   }
 
   if (server.ssh && server.ssh.password) {
-    const isPassDiff = (oldSever && server.ssh.password !== oldSever.ssh.password);
+    if (oldServer && oldServer.ssh && oldServer.ssh.password && typeof oldServer.ssh.password === 'string' && oldServer.encrypted) {
+      if (server.password === oldServer.password) {
+        updatedServer.password = crypto.unsafeDecrypt(oldServer.password, cryptoSecret);
+      }
+    }
 
-    if (!oldSever || isPassDiff) {
-      updatedServer.ssh.password = crypto.encrypt(server.ssh.password, cryptoSecret);
+    if (typeof updatedServer.ssh.password === 'string') {
+      updatedServer.ssh.password = crypto.encrypt(updatedServer.ssh.password, cryptoSecret);
     }
   }
 
@@ -97,16 +104,19 @@ function encryptSecrects(server, cryptoSecret, oldSever) {
 // decrypt secret fields
 export function decryptSecrects(server, cryptoSecret) {
   const updatedServer = { ...server };
-  /* eslint no-param-reassign:0 */
   if (!server.encrypted) {
-    return;
+    return server;
   }
 
-  if (server.password) {
+  if (server.password && typeof server.password === 'string') {
+    updatedServer.password = crypto.unsafeDecrypt(server.password, cryptoSecret);
+  } else if (server.password) {
     updatedServer.password = crypto.decrypt(server.password, cryptoSecret);
   }
 
-  if (server.ssh && server.ssh.password) {
+  if (server.ssh && server.ssh.password && typeof server.ssh.password === 'string') {
+    updatedServer.ssh.password = crypto.unsafeDecrypt(server.ssh.password, cryptoSecret);
+  } else if (server.ssh && server.ssh.password) {
     updatedServer.ssh.password = crypto.decrypt(server.ssh.password, cryptoSecret);
   }
 
