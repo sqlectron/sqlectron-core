@@ -17,10 +17,11 @@ export default async function (server, database) {
   const conn = { dbConfig };
 
   // light solution to test connection with with the server
-  await driverExecuteQuery(conn, { query: 'SELECT sqlite_version()' });
+  const version = (await driverExecuteQuery(conn, { query: 'SELECT sqlite_version() as version' })).data[0].version;
 
   return {
     wrapIdentifier,
+    version,
     disconnect: () => disconnect(conn),
     listTables: () => listTables(conn),
     listViews: () => listViews(conn),
