@@ -730,8 +730,8 @@ describe('db', () => {
                 expect(results).to.have.length(1);
                 const [result] = results;
 
-                expect(result).to.have.deep.property('fields[0].name').to.eql('createdat');
-                expect(result).to.have.deep.property('rows[0].createdat').to.match(/^2016-10-25/);
+                expect(result).to.have.nested.property('fields[0].name').to.eql('createdat');
+                expect(result).to.have.nested.property('rows[0].createdat').to.match(/^2016-10-25/);
               });
             }
 
