@@ -1,4 +1,4 @@
-import mysql from 'mysql';
+import mysql from 'mysql2';
 import { identify } from 'sql-query-identifier';
 
 import createLogger from '../../logger';
@@ -102,6 +102,7 @@ export async function listTableColumns(conn, database, table) {
     FROM information_schema.columns
     WHERE table_schema = database()
     AND table_name = ?
+    ORDER BY ordinal_position
   `;
 
   const params = [
