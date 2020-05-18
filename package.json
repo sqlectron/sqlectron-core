@@ -8,7 +8,7 @@
   "scripts": {
     "compile": "babel -d lib/ src/",
     "watch": "babel --watch -d lib/ src/",
-    "prepublish": "npm run compile",
+    "prepublishOnly": "npm run compile",
     "lint": "eslint src/ spec/",
     "test:mysql": "DB_CLIENTS=mysql npm run test",
     "test:sqlite": "DB_CLIENTS=sqlite npm run test",
