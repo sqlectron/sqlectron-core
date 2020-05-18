@@ -1075,7 +1075,7 @@ describe('db', () => {
                 expect(result).to.have.property('command').to.eql('EXPLAIN');
                 expect(result).to.have.property('rows').to.have.length.above(0);
                 expect(result).to.have.deep.property('fields').to.have.length(1);
-                expect(result).to.have.deep.property('fields[0].name').to.eql('QUERY PLAN');
+                expect(result).to.have.nested.property('fields[0].name').to.eql('QUERY PLAN');
                 expect(result).to.have.property('affectedRows').to.eql(undefined);
                 expect(result).to.have.property('rowCount').to.eql(undefined);
               });
