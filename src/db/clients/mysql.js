@@ -1,4 +1,4 @@
-import mysql from 'mysql';
+import mysql from 'mysql2';
 import { identify } from 'sql-query-identifier';
 
 import createLogger from '../../logger';

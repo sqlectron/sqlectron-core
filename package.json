@@ -37,7 +37,7 @@
     "env-paths": "^1.0.0",
     "mkdirp": "^0.5.2",
     "mssql": "^3.0.0",
-    "mysql": "^2.10.2",
+    "mysql2": "^2.1.0",
     "pg": "^7.18.0",
     "portfinder": "^0.4.0",
     "sql-query-identifier": "^1.1.0",
