@@ -18,6 +18,7 @@ export function createConnection(server, database) {
   return {
     connect: connect.bind(null, server, database),
     disconnect: disconnect.bind(null, server, database),
+    version: version.bind(null, server, database),
     listTables: listTables.bind(null, server, database),
     listViews: listViews.bind(null, server, database),
     listRoutines: listRoutines.bind(null, server, database),
@@ -117,6 +118,11 @@ function disconnect(server, database) {
   if (server.db[database.database]) {
     delete server.db[database.database];
   }
+}
+
+function version(server, database) {
+  checkIsConnected(server, database);
+  return database.connection.version;
 }
 
 function listSchemas(server, database, filter) {

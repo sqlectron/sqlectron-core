@@ -91,6 +91,13 @@ describe('db', () => {
           });
         });
 
+        describe('.version', () => {
+          it('should return a version', async () => {
+            expect(dbConn.version()).to.be.a('string');
+            expect(dbConn.version()).to.not.be.empty;
+          });
+        });
+
         describe('.listDatabases', () => {
           it('should list all databases', async () => {
             const databases = await dbConn.listDatabases();

@@ -22,10 +22,11 @@ export default async function (server, database) {
   };
 
   // light solution to test connection with with the server
-  await driverExecuteQuery(conn, { query: 'select version();' });
+  const version = (await driverExecuteQuery(conn, { query: 'select version() as version;' })).data[0].version;
 
   return {
     wrapIdentifier,
+    version,
     disconnect: () => disconnect(conn),
     listTables: () => listTables(conn),
     listViews: () => listViews(conn),
