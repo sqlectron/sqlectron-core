@@ -15,8 +15,8 @@
     "test:sqlserver": "DB_CLIENTS=sqlserver npm run test",
     "test:postgresql": "DB_CLIENTS=postgresql npm run test",
     "test:cassandra": "DB_CLIENTS=cassandra npm run test",
-    "test": "npm run lint && mocha --exit --timeout 40000 --compilers js:babel-core/register --reporter spec ./spec/**/*.spec.js",
-    "watch-test": "npm run lint && mocha --compilers js:babel/register --watch --reporter spec ./spec/**/*.spec.js"
+    "test": "npm run lint && mocha --exit --timeout 40000 --require @babel/register --reporter spec ./spec/**/*.spec.js",
+    "watch-test": "npm run lint && mocha --require @babel/register --watch --reporter spec ./spec/**/*.spec.js"
   },
   "keywords": [
     "sqlectron",
@@ -47,19 +47,20 @@
     "valida": "^2.0.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.14.0",
-    "babel-eslint": "^7.2.3",
-    "babel-plugin-syntax-object-rest-spread": "^6.13.0",
-    "babel-plugin-transform-async-to-generator": "^6.8.0",
-    "babel-plugin-transform-es2015-destructuring": "^6.9.0",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.14.0",
-    "babel-plugin-transform-object-rest-spread": "^6.8.0",
-    "chai": "^3.5.0",
-    "chai-as-promised": "^5.3.0",
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/plugin-proposal-object-rest-spread": "^7.9.6",
+    "@babel/plugin-transform-async-to-generator": "^7.8.3",
+    "@babel/plugin-transform-destructuring": "^7.9.5",
+    "@babel/plugin-transform-modules-commonjs": "^7.9.6",
+    "@babel/register": "^7.9.0",
+    "babel-eslint": "^10.1.0",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^11.3.2",
     "eslint-plugin-import": "^2.20.2",
-    "mocha": "^5.2.0",
-    "sinon": "^1.17.2"
+    "mocha": "^6.2.3",
+    "sinon": "^7.5.0"
   }
 }
