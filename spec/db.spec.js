@@ -613,7 +613,7 @@ describe('db', () => {
                 }
 
                 try {
-                  expect(error).to.exists;
+                  expect(error).to.exist;
                   expect(error.sqlectronError).to.eql('CANCELED_BY_USER');
                   done();
                 } catch (err) {
@@ -713,11 +713,11 @@ describe('db', () => {
               expect(field('role_id')).to.exist;
               expect(field('createdat')).to.exist;
 
-              expect(result).to.have.deep.property('rows[0].id').to.eql(1);
-              expect(result).to.have.deep.property('rows[0].username').to.eql('maxcnunes');
-              expect(result).to.have.deep.property('rows[0].password').to.eql('123456');
-              expect(result).to.have.deep.property('rows[0].email').to.eql('maxcnunes@gmail.com');
-              expect(result).to.have.deep.property('rows[0].createdat');
+              expect(result).to.have.nested.property('rows[0].id').to.eql(1);
+              expect(result).to.have.nested.property('rows[0].username').to.eql('maxcnunes');
+              expect(result).to.have.nested.property('rows[0].password').to.eql('123456');
+              expect(result).to.have.nested.property('rows[0].email').to.eql('maxcnunes@gmail.com');
+              expect(result).to.have.nested.property('rows[0].createdat');
 
               expect(result).to.have.property('command').to.eql('SELECT');
               expect(result).to.have.deep.property('rowCount').to.eql(1);
@@ -745,24 +745,24 @@ describe('db', () => {
                 expect(results).to.have.length(2);
                 const [firstResult, secondResult] = results;
 
-                expect(firstResult).to.have.deep.property('fields[0].name').to.eql('id');
-                expect(firstResult).to.have.deep.property('fields[1].name').to.eql('username');
-                expect(firstResult).to.have.deep.property('fields[2].name').to.eql('email');
-                expect(firstResult).to.have.deep.property('fields[3].name').to.eql('password');
+                expect(firstResult).to.have.nested.property('fields[0].name').to.eql('id');
+                expect(firstResult).to.have.nested.property('fields[1].name').to.eql('username');
+                expect(firstResult).to.have.nested.property('fields[2].name').to.eql('email');
+                expect(firstResult).to.have.nested.property('fields[3].name').to.eql('password');
 
-                expect(firstResult).to.have.deep.property('rows[0].id').to.eql(1);
-                expect(firstResult).to.have.deep.property('rows[0].username').to.eql('maxcnunes');
-                expect(firstResult).to.have.deep.property('rows[0].password').to.eql('123456');
-                expect(firstResult).to.have.deep.property('rows[0].email').to.eql('maxcnunes@gmail.com');
+                expect(firstResult).to.have.nested.property('rows[0].id').to.eql(1);
+                expect(firstResult).to.have.nested.property('rows[0].username').to.eql('maxcnunes');
+                expect(firstResult).to.have.nested.property('rows[0].password').to.eql('123456');
+                expect(firstResult).to.have.nested.property('rows[0].email').to.eql('maxcnunes@gmail.com');
 
                 expect(firstResult).to.have.property('command').to.eql('SELECT');
                 expect(firstResult).to.have.deep.property('rowCount').to.eql(1);
 
-                expect(secondResult).to.have.deep.property('fields[0].name').to.eql('id');
-                expect(secondResult).to.have.deep.property('fields[1].name').to.eql('name');
+                expect(secondResult).to.have.nested.property('fields[0].name').to.eql('id');
+                expect(secondResult).to.have.nested.property('fields[1].name').to.eql('name');
 
-                expect(secondResult).to.have.deep.property('rows[0].id').to.eql(1);
-                expect(secondResult).to.have.deep.property('rows[0].name').to.eql('developer');
+                expect(secondResult).to.have.nested.property('rows[0].id').to.eql(1);
+                expect(secondResult).to.have.nested.property('rows[0].name').to.eql('developer');
 
                 expect(secondResult).to.have.property('command').to.eql('SELECT');
                 expect(secondResult).to.have.deep.property('rowCount').to.eql(1);
