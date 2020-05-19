@@ -15,23 +15,23 @@ jobs:
         include:
           - node-version: 6.x
             mysql-version: 5.7
-            cassandra-version: 3.7
+            cassandra-version: 3.0
             postgres-version: 9
           - node-version: 8.x
             mysql-version: 5.7
-            cassandra-version: 3.7
+            cassandra-version: 3.0
             postgres-version: 9
           - node-version: 10.x
             mysql-version: 5.7
-            cassandra-version: 3.7
+            cassandra-version: 3.0
             postgres-version: 9
           - node-version: 10.x
             mysql-version: 5.7
-            cassandra-version: 3.7
+            cassandra-version: 3.11
             postgres-version: 9
           - node-version: 12.x
             mysql-version: 5.7
-            cassandra-version: 3.7
+            cassandra-version: 3.0
             postgres-version: 9
 
     env:
