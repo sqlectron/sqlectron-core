@@ -59,11 +59,21 @@ export function disconnect(client) {
 
 export function listTables(client, database) {
   return new Promise((resolve, reject) => {
-    const sql = `
-      SELECT table_name as name
-      FROM system_schema.tables
-      WHERE keyspace_name = ?
-    `;
+    let sql;
+    if (client.version.split('.')[0] === '2') {
+      sql = `
+        SELECT columnfamily_name as name
+        FROM system.schema_columnfamilies
+        WHERE keyspace_name = ?
+      `;
+    } else {
+      sql = `
+        SELECT table_name as name
+        FROM system_schema.tables
+        WHERE keyspace_name = ?
+      `;
+    }
+
     const params = [database];
     client.execute(sql, params, (err, data) => {
       if (err) return reject(err);
@@ -81,13 +91,24 @@ export function listRoutines() {
 }
 
 export function listTableColumns(client, database, table) {
+  const cassandra2 = client.version.split('.')[0] === '2';
   return new Promise((resolve, reject) => {
-    const sql = `
-      SELECT position, column_name, type
-      FROM system_schema.columns
-      WHERE keyspace_name = ?
-        AND table_name = ?
-    `;
+    let sql;
+    if (cassandra2) {
+      sql = `
+        SELECT type as position, column_name, validator as type
+        FROM system.schema_columns
+        WHERE keyspace_name = ?
+          AND columnfamily_name = ?
+      `;
+    } else {
+      sql = `
+        SELECT position, column_name, type
+        FROM system_schema.columns
+        WHERE keyspace_name = ?
+          AND table_name = ?
+      `;
+    }
     const params = [
       database,
       table,
@@ -97,14 +118,54 @@ export function listTableColumns(client, database, table) {
       resolve(
         data.rows
           // force pks be placed at the results beginning
-          .sort((a, b) => b.position - a.position)
-          .map((row) => ({
-            columnName: row.column_name,
-            dataType: row.type,
-          })),
+          .sort((a, b) => {
+            if (cassandra2) {
+              return (+(a.position > b.position) || -(a.position < b.position));
+            }
+            return b.position - a.position;
+          }).map((row) => {
+            const rowType = cassandra2 ? mapLegacyDataTypes(row.type) : row.type;
+            return {
+              columnName: row.column_name,
+              dataType: rowType,
+            };
+          }),
       );
     });
   });
+}
+
+/**
+ * The system schema of Casandra 2.x does not have data type, but only validator
+ * classes. To make the behavior consistent with v3.x, we try to deduce the
+ * correponding CQL data type using the validator name.
+ *
+ * @param {string} validator
+ * @returns {string}
+ */
+function mapLegacyDataTypes(validator) {
+  const type = validator.split('.').pop();
+  switch (type) {
+    case 'Int32Type':
+    case 'LongType':
+      return 'int';
+    case 'UTF8Type':
+      return 'text';
+    case 'TimestampType':
+    case 'DateType':
+      return 'timestamp';
+    case 'DoubleType':
+      return 'double';
+    case 'FloatType':
+      return 'float';
+    case 'UUIDType':
+      return 'uuid';
+    case 'CounterColumnType':
+      return 'counter';
+    default:
+      logger().debug('validator %s is not yet mapped!', validator);
+      return type;
+  }
 }
 
 export function listTableTriggers() {
@@ -123,29 +184,16 @@ export function getTableReferences() {
 }
 
 export function getTableKeys(client, database, table) {
-  return new Promise((resolve, reject) => {
-    const sql = `
-      SELECT column_name
-      FROM system_schema.columns
-      WHERE keyspace_name = ?
-        AND table_name = ?
-        AND kind = 'partition_key'
-      ALLOW FILTERING
-    `;
-    const params = [
-      database,
-      table,
-    ];
-    client.execute(sql, params, (err, data) => {
-      if (err) return reject(err);
-      resolve(data.rows.map((row) => ({
+  return client.metadata
+    .getTable(database, table)
+    .then((tableInfo) => tableInfo
+      .partitionKeys
+      .map((key) => ({
         constraintName: null,
-        columnName: row.column_name,
+        columnName: key.name,
         referencedTable: null,
         keyType: 'PRIMARY KEY',
       })));
-    });
-  });
 }
 
 function query(conn, queryText) { // eslint-disable-line no-unused-vars
@@ -166,13 +214,8 @@ export function executeQuery(client, queryText) {
 
 
 export function listDatabases(client) {
-  return new Promise((resolve, reject) => {
-    const sql = 'SELECT keyspace_name FROM system_schema.keyspaces';
-    const params = [];
-    client.execute(sql, params, (err, data) => {
-      if (err) return reject(err);
-      resolve(data.rows.map((row) => row.keyspace_name));
-    });
+  return new Promise((resolve) => {
+    resolve(Object.keys(client.metadata.keyspaces));
   });
 }
 
@@ -202,13 +245,8 @@ export function wrapIdentifier(value) {
 
 
 export const truncateAllTables = async (connection, database) => {
-  const sql = `
-    SELECT table_name
-    FROM system_schema.tables
-    WHERE keyspace_name = '${database}'
-  `;
-  const [result] = await executeQuery(connection, sql);
-  const tables = result.rows.map((row) => row.table_name);
+  const result = await listTables(connection, database);
+  const tables = result.map((table) => table.name);
   const promises = tables.map((t) => {
     const truncateSQL = `
       TRUNCATE TABLE ${wrapIdentifier(database)}.${wrapIdentifier(t)};

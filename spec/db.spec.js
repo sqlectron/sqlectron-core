@@ -688,7 +688,11 @@ describe('db', () => {
                 }
               } catch (err) {
                 if (dbClient === 'cassandra') {
-                  expect(err.message).to.eql('line 1:13 mismatched character \'<EOF>\' expecting set null');
+                  if (dbConn.version().split('.')[0] === '2') {
+                    expect(err.message).to.eql('line 0:-1 no viable alternative at input \'<EOF>\'');
+                  } else {
+                    expect(err.message).to.eql('line 1:13 mismatched character \'<EOF>\' expecting set null');
+                  }
                 } else {
                   throw err;
                 }

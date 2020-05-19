@@ -15,7 +15,7 @@ jobs:
         include:
           - node-version: 6.x
             mysql-version: 5.7
-            cassandra-version: 3.0
+            cassandra-version: 2.1
             postgres-version: 9
           - node-version: 8.x
             mysql-version: 5.7
