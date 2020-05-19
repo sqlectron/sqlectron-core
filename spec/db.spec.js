@@ -681,7 +681,11 @@ describe('db', () => {
                 }
               } catch (err) {
                 if (dbClient === 'cassandra') {
-                  expect(err.message).to.eql('line 1:13 mismatched character \'<EOF>\' expecting set null');
+                  if (dbConn.version().split('.')[0] === '2') {
+                    expect(err.message).to.eql('line 0:-1 no viable alternative at input \'<EOF>\'');
+                  } else {
+                    expect(err.message).to.eql('line 1:13 mismatched character \'<EOF>\' expecting set null');
+                  }
                 } else {
                   throw err;
                 }
@@ -782,7 +786,7 @@ describe('db', () => {
                 expect(secondResult).to.have.deep.property('rowCount').to.eql(1);
               } catch (err) {
                 if (dbClient === 'cassandra') {
-                  if (parseFloat(dbConn.version()) >= 3.10) {
+                  if (parseFloat(dbConn.version().split('.').slice(0, 2)) >= 3.10) {
                     expect(err.message).to.match(/mismatched input 'select' expecting EOF/);
                   } else {
                     expect(err.message).to.match(/missing EOF at 'select'/);
@@ -862,7 +866,7 @@ describe('db', () => {
                 }
               } catch (err) {
                 if (dbClient === 'cassandra') {
-                  if (parseFloat(dbConn.version()) >= 3.10) {
+                  if (parseFloat(dbConn.version().split('.').slice(0, 2)) >= 3.10) {
                     expect(err.message).to.match(/mismatched input 'insert' expecting EOF/);
                   } else {
                     expect(err.message).to.match(/missing EOF at 'insert'/);
@@ -938,7 +942,7 @@ describe('db', () => {
                 }
               } catch (err) {
                 if (dbClient === 'cassandra') {
-                  if (parseFloat(dbConn.version()) >= 3.10) {
+                  if (parseFloat(dbConn.version().split('.').slice(0, 2)) >= 3.10) {
                     expect(err.message).to.match(/mismatched input 'delete' expecting EOF/);
                   } else {
                     expect(err.message).to.match(/missing EOF at 'delete'/);
@@ -1014,7 +1018,7 @@ describe('db', () => {
                 }
               } catch (err) {
                 if (dbClient === 'cassandra') {
-                  if (parseFloat(dbConn.version()) >= 3.10) {
+                  if (parseFloat(dbConn.version().split('.').slice(0, 2)) >= 3.10) {
                     expect(err.message).to.match(/mismatched input 'update' expecting EOF/);
                   } else {
                     expect(err.message).to.match(/missing EOF at 'update'/);
