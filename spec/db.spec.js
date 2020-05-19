@@ -786,7 +786,7 @@ describe('db', () => {
                 expect(secondResult).to.have.deep.property('rowCount').to.eql(1);
               } catch (err) {
                 if (dbClient === 'cassandra') {
-                  if (parseFloat(dbConn.version().split('.').slice(0, 2)) >= 3.10) {
+                  if (parseFloat(dbConn.version().split('.').slice(0, 2).join('.')) >= 3.10) {
                     expect(err.message).to.match(/mismatched input 'select' expecting EOF/);
                   } else {
                     expect(err.message).to.match(/missing EOF at 'select'/);
@@ -866,7 +866,7 @@ describe('db', () => {
                 }
               } catch (err) {
                 if (dbClient === 'cassandra') {
-                  if (parseFloat(dbConn.version().split('.').slice(0, 2)) >= 3.10) {
+                  if (parseFloat(dbConn.version().split('.').slice(0, 2).join('.')) >= 3.10) {
                     expect(err.message).to.match(/mismatched input 'insert' expecting EOF/);
                   } else {
                     expect(err.message).to.match(/missing EOF at 'insert'/);
@@ -942,7 +942,7 @@ describe('db', () => {
                 }
               } catch (err) {
                 if (dbClient === 'cassandra') {
-                  if (parseFloat(dbConn.version().split('.').slice(0, 2)) >= 3.10) {
+                  if (parseFloat(dbConn.version().split('.').slice(0, 2).join('.')) >= 3.10) {
                     expect(err.message).to.match(/mismatched input 'delete' expecting EOF/);
                   } else {
                     expect(err.message).to.match(/missing EOF at 'delete'/);
@@ -1018,7 +1018,7 @@ describe('db', () => {
                 }
               } catch (err) {
                 if (dbClient === 'cassandra') {
-                  if (parseFloat(dbConn.version().split('.').slice(0, 2)) >= 3.10) {
+                  if (parseFloat(dbConn.version().split('.').slice(0, 2).join('.')) >= 3.10) {
                     expect(err.message).to.match(/mismatched input 'update' expecting EOF/);
                   } else {
                     expect(err.message).to.match(/missing EOF at 'update'/);
