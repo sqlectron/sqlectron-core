@@ -1,4 +1,4 @@
-import Valida from 'valida';
+import Valida from 'valida2';
 import { CLIENTS } from '../db';
 
 
