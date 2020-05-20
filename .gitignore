@@ -5,3 +5,4 @@ npm-debug.log
 lib
 spec/fixtures/.tmp.sqlectron.json
 sqlectron.db
+.nyc_output/

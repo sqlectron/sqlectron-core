@@ -16,6 +16,7 @@
     "test:postgresql": "DB_CLIENTS=postgresql npm run test",
     "test:cassandra": "DB_CLIENTS=cassandra npm run test",
     "test": "npm run lint && mocha --exit --timeout 40000 --require @babel/register --reporter spec ./spec/**/*.spec.js",
+    "test:coverage": "nyc --reporter=text mocha --exit --timeout 4000 --require @babel/register --reporter spec ./spec/**/*.spec.js",
     "watch-test": "npm run lint && mocha --require @babel/register --watch --reporter spec ./spec/**/*.spec.js"
   },
   "keywords": [
@@ -61,6 +62,11 @@
     "eslint-config-airbnb-base": "^11.3.2",
     "eslint-plugin-import": "^2.20.2",
     "mocha": "^6.2.3",
+    "nyc": "^14.1.1",
     "sinon": "^7.5.0"
+  },
+  "nyc": {
+    "include": "src",
+    "exclude": "**/*.spec.js"
   }
 }
