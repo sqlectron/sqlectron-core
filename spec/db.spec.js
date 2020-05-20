@@ -310,7 +310,19 @@ describe('db', () => {
           it('should return table create script', async () => {
             const [createScript] = await dbConn.getTableCreateScript('users');
 
-            if (dbClient === 'mysql') {
+            if (dbClient === 'mysql' && parseInt(dbConn.version()[0], 10) >= '8') {
+              expect(createScript).to.contain('CREATE TABLE `users` (\n' +
+              '  `id` int NOT NULL AUTO_INCREMENT,\n' +
+              '  `username` varchar(45) DEFAULT NULL,\n' +
+              '  `email` varchar(150) DEFAULT NULL,\n' +
+              '  `password` varchar(45) DEFAULT NULL,\n' +
+              '  `role_id` int DEFAULT NULL,\n' +
+              '  `createdat` datetime DEFAULT NULL,\n' +
+              '  PRIMARY KEY (`id`),\n' +
+              '  KEY `role_id` (`role_id`),\n' +
+              '  CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE\n' +
+              ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci');
+            } else if (dbClient === 'mysql') {
               expect(createScript).to.contain('CREATE TABLE `users` (\n' +
                 '  `id` int(11) NOT NULL AUTO_INCREMENT,\n' +
                 '  `username` varchar(45) DEFAULT NULL,\n' +
