@@ -396,10 +396,16 @@ export async function truncateAllTables(conn) {
 
     const { data } = await driverExecuteQuery(connClient, { query: sql });
 
+    const disableForeignKeys = data.map((row) => `
+      ALTER TABLE ${wrapIdentifier(schema)}.${wrapIdentifier(row.table_name)} NOCHECK CONSTRAINT all
+    `).join(';');
     const truncateAll = data.map((row) => `
-      DELETE FROM ${wrapIdentifier(schema)}.${wrapIdentifier(row.table_name)}
+      DELETE FROM ${wrapIdentifier(schema)}.${wrapIdentifier(row.table_name)};
       DBCC CHECKIDENT ('${schema}.${row.table_name}', RESEED, 0);
     `).join('');
+    const disableForeignKeys = data.map((row) => `
+      ALTER TABLE ${wrapIdentifier(schema)}.${wrapIdentifier(row.table_name)} WITH CHECK CHECK CONSTRAINT all
+    `).join(';');
 
     await driverExecuteQuery(connClient, { query: truncateAll, multiple: true });
   });
