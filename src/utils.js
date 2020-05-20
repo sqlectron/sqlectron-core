@@ -68,7 +68,7 @@ export function writeJSONFileSync(filename, data) {
 export function readFile(filename) {
   const filePath = resolveHomePathToAbsolute(filename);
   return new Promise((resolve, reject) => {
-    fs.readFile(path.resolve(filePath), (err, data) => {
+    fs.readFile(path.resolve(filePath), { encoding: 'utf-8' }, (err, data) => {
       if (err) return reject(err);
       resolve(data);
     });

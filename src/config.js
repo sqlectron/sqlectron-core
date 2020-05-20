@@ -11,7 +11,7 @@ function sanitizeServer(server, cryptoSecret) {
   if (!srv.id) { srv.id = uuid.v4(); }
 
   // ensure has the new fileld SSL
-  if (typeof srv.ssl === 'undefined') { srv.ssl = false; }
+  srv.ssl = srv.ssl || false;
 
   // ensure all secret fields are encrypted
   if (typeof srv.encrypted === 'undefined') {
@@ -23,6 +23,19 @@ function sanitizeServer(server, cryptoSecret) {
 
     if (srv.ssh && srv.ssh.password) {
       srv.ssh.password = crypto.encrypt(srv.ssh.password, cryptoSecret);
+    }
+  } else if (srv.encrypted) {
+    if (srv.password && typeof srv.password === 'string') {
+      srv.password = crypto.encrypt(
+        crypto.unsafeDecrypt(srv.password, cryptoSecret),
+        cryptoSecret,
+      );
+    }
+    if (srv.ssh && srv.ssh.password && typeof srv.ssh.password === 'string') {
+      srv.ssh.password = crypto.encrypt(
+        crypto.unsafeDecrypt(srv.ssh.password, cryptoSecret),
+        cryptoSecret,
+      );
     }
   }
 

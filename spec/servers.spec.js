@@ -6,12 +6,14 @@ import utilsStub from './utils-stub';
 
 const cryptoSecret = 'CHK`Ya91Hs{me!^8ndwPPaPPxwQ}`';
 
-const assertPassword = (newData, savedData, password) => {
-  /* eslint no-param-reassign:0 */
-  expect(crypto.decrypt(savedData.password, cryptoSecret)).to.eql(password);
-  newData.password = crypto.encrypt(password, cryptoSecret);
-  newData.encrypted = true;
-};
+function assertPassword(newServer, createdServer) {
+  /* eslint no-param-reassign: 0 */
+  expect(createdServer).to.have.property('password').to.have.keys(['ivText', 'encryptedText']);
+  expect(crypto.decrypt(createdServer.password, cryptoSecret)).to.eql(newServer.password);
+  newServer.encrypted = true;
+  delete createdServer.password;
+  delete newServer.password;
+}
 
 describe('servers', () => {
   utilsStub.getConfigPath.install({ copyFixtureToTemp: true });
@@ -51,7 +53,7 @@ describe('servers', () => {
       const createdServer = await servers.add(newServer, cryptoSecret);
       expect(createdServer).to.have.property('id');
       delete createdServer.id;
-      assertPassword(newServer, createdServer, 'password');
+      assertPassword(newServer, createdServer);
       expect(createdServer).to.eql(newServer);
 
       const configAfter = await loadConfig();
@@ -80,7 +82,7 @@ describe('servers', () => {
       const createdServer = await servers.add(newServer, cryptoSecret);
       expect(createdServer).to.have.property('id');
       delete createdServer.id;
-      assertPassword(newServer, createdServer, 'password');
+      assertPassword(newServer, createdServer);
       expect(createdServer).to.eql(newServer);
 
       const configAfter = await loadConfig();
@@ -108,11 +110,12 @@ describe('servers', () => {
 
       const configAfter = await loadConfig();
       expect(configAfter.servers.length).to.eql(configBefore.servers.length);
-      expect(configAfter.servers.find((srv) => srv.id === id))
-        .to.eql({ ...serverToUpdate, password: 'fa0b9f', encrypted: true });
+      const configServer = configAfter.servers.find((srv) => srv.id === id);
+      assertPassword(serverToUpdate, configServer);
+      expect(updatedServer).to.eql(configServer);
     });
 
-    it('should not update encrypted password when password has not changed', async () => {
+    it('should upgrade oldstyle encrypted password', async () => {
       const id = '65f36ca9-331f-43b3-ab38-3f5556fd65ce';
       const configBefore = await loadConfig();
       const serverToUpdate = {
@@ -131,9 +134,38 @@ describe('servers', () => {
 
       const configAfter = await loadConfig();
       expect(configAfter.servers.length).to.eql(configBefore.servers.length);
-      expect(configAfter.servers.find((srv) => srv.id === id))
-        .to.eql({ ...serverToUpdate, encrypted: true });
+      serverToUpdate.password = 'password';
+      const configServer = configAfter.servers.find((srv) => srv.id === id);
+      assertPassword(serverToUpdate, configServer);
+      expect(serverToUpdate).to.eql(configServer);
     });
+  });
+
+  it('should not update password when password is already encrypted', async () => {
+    const id = '440d4fef-6fc8-4e53-ba84-f89c91d9c542';
+    const configBefore = await loadConfig();
+    const serverToUpdate = {
+      id,
+      name: 'mysql-vm',
+      client: 'mysql',
+      ssl: false,
+      host: '10.10.10.10',
+      port: 3306,
+      database: 'mydb',
+      user: 'usr',
+      password: {
+        ivText: 'wGf6X9T+QSygOHqtgQPlcA==',
+        encryptedText: '0LySDs9WPAvwSS9Qv+W3/A==',
+      },
+    };
+    const updatedServer = await servers.update(serverToUpdate, cryptoSecret);
+    expect(updatedServer).to.eql(serverToUpdate);
+
+    const configAfter = await loadConfig();
+
+    expect(configAfter.servers.length).to.eql(configBefore.servers.length);
+    expect(configAfter.servers.find((srv) => srv.id === id))
+      .to.eql({ ...serverToUpdate, encrypted: true });
   });
 
   describe('.addOrUpdate', () => {
@@ -153,7 +185,7 @@ describe('servers', () => {
         const createdServer = await servers.addOrUpdate(newServer, cryptoSecret);
         expect(createdServer).to.have.property('id');
         delete createdServer.id;
-        assertPassword(newServer, createdServer, 'password');
+        assertPassword(newServer, createdServer);
         expect(createdServer).to.eql(newServer);
 
         const configAfter = await loadConfig();
@@ -181,8 +213,9 @@ describe('servers', () => {
 
         const configAfter = await loadConfig();
         expect(configAfter.servers.length).to.eql(configBefore.servers.length);
-        expect(configAfter.servers.find((srv) => srv.id === id))
-          .to.eql({ ...serverToUpdate, password: 'fa0b9f', encrypted: true });
+        const configServer = configAfter.servers.find((srv) => srv.id === id);
+        assertPassword(serverToUpdate, configServer);
+        expect(updatedServer).to.eql(configServer);
       });
     });
   });
@@ -195,6 +228,108 @@ describe('servers', () => {
       const configAfter = await loadConfig();
       expect(configAfter.servers.length).to.eql(configBefore.servers.length - 1);
       expect(configAfter.servers.find((srv) => srv.name === 'pg-vm')).to.eql(undefined);
+    });
+  });
+
+  describe('.decryptSecrets', () => {
+    it('should decrypt new style password', () => {
+      const encryptedServer = {
+        name: 'mysql-vm',
+        client: 'mysql',
+        ssl: false,
+        host: '10.10.10.10',
+        port: 3306,
+        database: 'mydb',
+        user: 'usr',
+        encrypted: true,
+        password: {
+          ivText: 'wGf6X9T+QSygOHqtgQPlcA==',
+          encryptedText: '0LySDs9WPAvwSS9Qv+W3/A==',
+        },
+      };
+      const decryptedServer = servers.decryptSecrects(encryptedServer, cryptoSecret);
+
+      encryptedServer.encrypted = false;
+      encryptedServer.password = 'password';
+      expect(decryptedServer).to.eql(encryptedServer);
+    });
+
+    it('should decrypt new style password for ssh', () => {
+      const encryptedServer = {
+        name: 'mysql-vm',
+        client: 'mysql',
+        ssl: false,
+        host: '10.10.10.10',
+        port: 3306,
+        database: 'mydb',
+        user: 'usr',
+        encrypted: true,
+        ssh: {
+          password: {
+            ivText: 'wGf6X9T+QSygOHqtgQPlcA==',
+            encryptedText: '0LySDs9WPAvwSS9Qv+W3/A==',
+          },
+        },
+      };
+      const decryptedServer = servers.decryptSecrects(encryptedServer, cryptoSecret);
+
+      encryptedServer.encrypted = false;
+      encryptedServer.ssh.password = 'password';
+      expect(decryptedServer).to.eql(encryptedServer);
+    });
+
+    it('should decrypt old style password', () => {
+      const encryptedServer = {
+        name: 'mysql-vm',
+        client: 'mysql',
+        ssl: false,
+        host: '10.10.10.10',
+        port: 3306,
+        database: 'mydb',
+        user: 'usr',
+        encrypted: true,
+        password: 'fa1d88ee82bd4439',
+      };
+      const decryptedServer = servers.decryptSecrects(encryptedServer, cryptoSecret);
+
+      encryptedServer.encrypted = false;
+      encryptedServer.password = 'password';
+      expect(decryptedServer).to.eql(encryptedServer);
+    });
+
+    it('should decrypt old style password for ssh', () => {
+      const encryptedServer = {
+        name: 'mysql-vm',
+        client: 'mysql',
+        ssl: false,
+        host: '10.10.10.10',
+        port: 3306,
+        database: 'mydb',
+        user: 'usr',
+        encrypted: true,
+        ssh: {
+          password: 'fa1d88ee82bd4439',
+        },
+      };
+      const decryptedServer = servers.decryptSecrects(encryptedServer, cryptoSecret);
+
+      encryptedServer.encrypted = false;
+      encryptedServer.ssh.password = 'password';
+      expect(decryptedServer).to.eql(encryptedServer);
+    });
+
+    it('should do nothing for unencrypted server', () => {
+      const encryptedServer = {
+        name: 'mysql-vm',
+        client: 'mysql',
+        ssl: false,
+        host: '10.10.10.10',
+        port: 3306,
+        database: 'mydb',
+        user: 'usr',
+        password: 'password',
+      };
+      expect(servers.decryptSecrects(encryptedServer, cryptoSecret)).to.eql(encryptedServer);
     });
   });
 
