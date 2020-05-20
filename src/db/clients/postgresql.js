@@ -356,6 +356,7 @@ export async function getTableCreateScript(conn, table, schema) {
       array_to_string(
         array_agg(
           '  ' || quote_ident(tabdef.column_name) || ' ' ||  tabdef.type || ' '|| tabdef.not_null
+          ORDER BY tabdef.column_order ASC
         )
         , E',\n'
       ) || E'\n);\n' ||
@@ -373,7 +374,8 @@ export async function getTableCreateScript(conn, table, schema) {
           WHEN a.attnotnull THEN 'NOT NULL'
         ELSE 'NULL'
         END AS not_null,
-        n.nspname as schema_name
+        n.nspname as schema_name,
+        a.attnum as column_order
       FROM pg_class c,
        pg_attribute a,
        pg_type t,
