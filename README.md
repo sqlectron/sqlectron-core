@@ -1,7 +1,7 @@
 # sqlectron-core
 
 
-[![Build status](https://ci.appveyor.com/api/projects/status/bdnpb06lu4sl0hwn/branch/master?svg=true)](https://ci.appveyor.com/project/maxcnunes/sqlectron-core/branch/master)
+![Build Status](https://github.com/sqlectron/sqlectron-core/workflows/Test/badge.svg?branch=master)
 
 The common code used by all sqlectron clients.
 
