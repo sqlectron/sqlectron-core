@@ -171,11 +171,9 @@ export async function validate(server) {
 
 
 export function validateUniqueId(servers, serverId) {
-  if (!serverId) { return; }
+  if (!serverId) {
+    throw new Error('serverId should be set');
+  }
 
-  const server = servers.find((srv) => srv.id === serverId);
-  if (!server) { return; }
-  if (serverId && server.id === serverId) { return; }
-
-  throw new Error('Already exist another server with same id');
+  return !servers.find((srv) => srv.id === serverId);
 }
