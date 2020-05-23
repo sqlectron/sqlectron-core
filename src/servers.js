@@ -15,8 +15,10 @@ export async function add(server, cryptoSecret) {
   await validate(srv);
 
   const data = await config.get();
-  const newId = uuid.v4();
-  validateUniqueId(data.servers, newId);
+  let newId;
+  do {
+    newId = uuid.v4();
+  } while (!validateUniqueId(data.servers, newId));
 
   srv = encryptSecrects(srv, cryptoSecret);
 
@@ -33,7 +35,6 @@ export async function update(server, cryptoSecret) {
   await validate(srv);
 
   const data = await config.get();
-  validateUniqueId(data.servers, srv.id);
 
   const index = data.servers.findIndex((item) => item.id === srv.id);
   srv = encryptSecrects(srv, cryptoSecret, data.servers[index]);
