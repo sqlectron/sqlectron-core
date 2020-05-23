@@ -9,7 +9,7 @@ function serverAddressValidator(ctx) {
   if ((!host && !socketPath) || (host && socketPath)) {
     return {
       validator: 'serverAddressValidator',
-      msg: 'You must use host+port or socket path',
+      msg: 'You must use host or socket path',
     };
   }
 
