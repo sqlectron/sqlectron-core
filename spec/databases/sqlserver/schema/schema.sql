@@ -17,7 +17,7 @@ CREATE TABLE dbo.users
     CONSTRAINT fk_user_role FOREIGN KEY (role_id) REFERENCES roles (id))
 END;
 
-IF EXISTS (SELECT table_name FROM information_schema.views WHERE table_name = 'email_view')
+IF EXISTS (SELECT table_name FROM INFORMATION_SCHEMA.VIEWS WHERE table_name = 'email_view')
    DROP VIEW dbo.email_view
 GO
 
