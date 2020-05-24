@@ -17,22 +17,27 @@ jobs:
             mysql-version: 5.7
             cassandra-version: 2.1
             postgres-version: 9
+            sqlserver-collation: Latin1_General_CI_AS
           - node-version: 8.x
             mysql-version: 5.7
             cassandra-version: "3.0"
             postgres-version: 9
+            sqlserver-collation: Latin1_General_CI_AS
           - node-version: 10.x
             mysql-version: 5.7
             cassandra-version: "3.0"
             postgres-version: 9
+            sqlserver-collation: Latin1_General_CI_AS
           - node-version: 10.x
             mysql-version: 8
             cassandra-version: 3.11
             postgres-version: 12
+            sqlserver-collation: Latin1_General_CS_AS
           - node-version: 12.x
             mysql-version: 5.7
             cassandra-version: "3.0"
             postgres-version: 9
+            sqlserver-collation: Latin1_General_CS_AS
 
     env:
       CASSANDRA_PORT: tcp://localhost:9042
@@ -63,7 +68,7 @@ jobs:
     - name: Create Cassandra Container
       run: docker run --rm -d --name cassandra -p 9042:9042 -v ${GITHUB_WORKSPACE}/spec/databases/cassandra/schema:/docker-entrypoint-initdb.d  cassandra:${{ matrix.cassandra-version }}
     - name: Create SQLServer Container
-      run: docker run --rm -d --name sqlserver -p 1433:1433 -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password12!" -v ${GITHUB_WORKSPACE}/spec/databases/sqlserver/schema:/docker-entrypoint-initdb.d mcr.microsoft.com/mssql/server:2017-latest
+      run: docker run --rm -d --name sqlserver -p 1433:1433 -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password12!" -e "MSSQL_COLLATION=${{ sqlserver-collation }}" -v ${GITHUB_WORKSPACE}/spec/databases/sqlserver/schema:/docker-entrypoint-initdb.d mcr.microsoft.com/mssql/server:2017-latest
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
