@@ -601,7 +601,7 @@ describe('db', () => {
               const sleepCommands = {
                 postgresql: 'SELECT pg_sleep(10);',
                 mysql: 'SELECT SLEEP(10000);',
-                mariadb: 'SELECT SLEEP(10000;',
+                mariadb: 'SELECT SLEEP(10000);',
                 sqlserver: 'WAITFOR DELAY \'00:00:10\'; SELECT 1 AS number',
                 sqlite: '',
               };
