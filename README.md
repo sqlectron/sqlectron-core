@@ -1,7 +1,7 @@
 # sqlectron-core
 
-
 ![Build Status](https://github.com/sqlectron/sqlectron-core/workflows/Test/badge.svg?branch=master)
+![npm](https://img.shields.io/npm/v/sqlectron-core)
 
 The common code used by all sqlectron clients.
 
