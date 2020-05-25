@@ -11,6 +11,7 @@
     "prepublishOnly": "npm run compile",
     "lint": "eslint src/ spec/",
     "test:mysql": "DB_CLIENTS=mysql npm run test",
+    "test:mariadb": "DB_CLIENTS=mariadb npm run test",
     "test:sqlite": "DB_CLIENTS=sqlite npm run test",
     "test:sqlserver": "DB_CLIENTS=sqlserver npm run test",
     "test:postgresql": "DB_CLIENTS=postgresql npm run test",
