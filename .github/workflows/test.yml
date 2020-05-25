@@ -15,26 +15,31 @@ jobs:
         include:
           - node-version: 6.x
             mysql-version: 5.7
+            maraidb-version: 10.1
             cassandra-version: 2.1
             postgres-version: 9
             sqlserver-collation: Latin1_General_CI_AS
           - node-version: 8.x
             mysql-version: 5.7
+            maraidb-version: 10.1
             cassandra-version: "3.0"
             postgres-version: 9
             sqlserver-collation: Latin1_General_CI_AS
           - node-version: 10.x
             mysql-version: 5.7
+            maraidb-version: 10.1
             cassandra-version: "3.0"
             postgres-version: 9
             sqlserver-collation: Latin1_General_CI_AS
           - node-version: 10.x
             mysql-version: 8
+            maraidb-version: 10.5
             cassandra-version: 3.11
             postgres-version: 12
             sqlserver-collation: Latin1_General_CS_AS
           - node-version: 12.x
             mysql-version: 5.7
+            maraidb-version: 10.1
             cassandra-version: "3.0"
             postgres-version: 9
             sqlserver-collation: Latin1_General_CS_AS
@@ -63,6 +68,8 @@ jobs:
 
     - name: Create MySQL Container
       run: docker run --rm -d --name mysql -e "MYSQL_ROOT_PASSWORD=Password12!" -e "MYSQL_DATABASE=sqlectron" -p 3306:3306 -v ${GITHUB_WORKSPACE}/spec/databases/mysql/schema:/docker-entrypoint-initdb.d mysql:${{ matrix.mysql-version }}
+    - name: Create MariaDB Container
+      run: docker run --rm -d --name mariadb -e "MYSQL_ROOT_PASSWORD=Password12!" -e "MYSQL_DATABASE=sqlectron" -p 3306:3306 -v ${GITHUB_WORKSPACE}/spec/databases/mysql/schema:/docker-entrypoint-initdb.d mariadb:${{ matrix.mysql-version }}
     - name: Create Postgres Container
       run: docker run --rm -d --name postgres -e "POSTGRES_PASSWORD=Password12!" -e "POSTGRES_DB=sqlectron" -p 5432:5432 -v ${GITHUB_WORKSPACE}/spec/databases/postgresql/schema:/docker-entrypoint-initdb.d postgres:${{ matrix.postgres-version }}
     - name: Create Cassandra Container
