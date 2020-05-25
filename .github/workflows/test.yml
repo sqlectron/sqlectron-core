@@ -57,6 +57,11 @@ jobs:
       MYSQL_ENV_MYSQL_PASSWORD: Password12!
       MYSQL_ENV_MYSQL_DATABASE: sqlectron
       MYSQL_PWD: Password12!
+      MARIADB_PORT: tcp://localhost:3307
+      MARIADB_ENV_MARIADBL_USER: root
+      MARIADB_ENV_MARIADB_PASSWORD: Password12!
+      MARIADB_ENV_MARIADB_DATABASE: sqlectron
+      MARIADB_PWD: Password12!
       SQLSERVER_ENV_SQLSERVER_HOST: localhost
       SQLSERVER_ENV_SQLSERVER_PORT: 1433
       SQLSERVER_ENV_SQLSERVER_USER: sa
@@ -69,7 +74,7 @@ jobs:
     - name: Create MySQL Container
       run: docker run --rm -d --name mysql -e "MYSQL_ROOT_PASSWORD=Password12!" -e "MYSQL_DATABASE=sqlectron" -p 3306:3306 -v ${GITHUB_WORKSPACE}/spec/databases/mysql/schema:/docker-entrypoint-initdb.d mysql:${{ matrix.mysql-version }}
     - name: Create MariaDB Container
-      run: docker run --rm -d --name mariadb -e "MYSQL_ROOT_PASSWORD=Password12!" -e "MYSQL_DATABASE=sqlectron" -p 3306:3306 -v ${GITHUB_WORKSPACE}/spec/databases/mysql/schema:/docker-entrypoint-initdb.d mariadb:${{ matrix.maraidb-version }}
+      run: docker run --rm -d --name mariadb -e "MYSQL_ROOT_PASSWORD=Password12!" -e "MYSQL_DATABASE=sqlectron" -p 3307:3306 -v ${GITHUB_WORKSPACE}/spec/databases/mysql/schema:/docker-entrypoint-initdb.d mariadb:${{ matrix.maraidb-version }}
     - name: Create Postgres Container
       run: docker run --rm -d --name postgres -e "POSTGRES_PASSWORD=Password12!" -e "POSTGRES_DB=sqlectron" -p 5432:5432 -v ${GITHUB_WORKSPACE}/spec/databases/postgresql/schema:/docker-entrypoint-initdb.d postgres:${{ matrix.postgres-version }}
     - name: Create Cassandra Container

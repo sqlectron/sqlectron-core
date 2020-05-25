@@ -17,6 +17,14 @@ export default {
     database: process.env.MYSQL_ENV_MYSQL_DATABASE,
     multipleStatements: true,
   },
+  mariadb: {
+    host: url.parse(process.env.MARIADB_PORT || '').hostname,
+    port: parseInt(url.parse(process.env.MARIADB_PORT || '').port, 10),
+    user: process.env.MARIADB_ENV_MARIADB_USER,
+    password: process.env.MARIADB_ENV_MARIADB_PASSWORD,
+    database: process.env.MARIADB_ENV_MARIADB_DATABASE,
+    multipleStatements: true,
+  },
   sqlserver: {
     host: process.env.SQLSERVER_ENV_SQLSERVER_HOST,
     port: parseInt(process.env.SQLSERVER_ENV_SQLSERVER_PORT, 10),
