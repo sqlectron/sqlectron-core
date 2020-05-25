@@ -19,6 +19,15 @@ export const CLIENTS = [
     ],
   },
   {
+    key: 'mariadb',
+    name: 'MariaDB',
+    defaultPort: 3306,
+    disabledFeatures: [
+      'server:schema',
+      'server:domain',
+    ],
+  },
+  {
     key: 'postgresql',
     name: 'PostgreSQL',
     defaultDatabase: 'postgres',
@@ -68,6 +77,7 @@ export const CLIENTS = [
 
 export default {
   mysql,
+  mariadb: mysql,
   postgresql,
   sqlserver,
   sqlite,
