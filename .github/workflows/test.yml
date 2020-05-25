@@ -58,7 +58,7 @@ jobs:
       MYSQL_ENV_MYSQL_DATABASE: sqlectron
       MYSQL_PWD: Password12!
       MARIADB_PORT: tcp://localhost:3307
-      MARIADB_ENV_MARIADBL_USER: root
+      MARIADB_ENV_MARIADB_USER: root
       MARIADB_ENV_MARIADB_PASSWORD: Password12!
       MARIADB_ENV_MARIADB_DATABASE: sqlectron
       MARIADB_PWD: Password12!
@@ -81,6 +81,7 @@ jobs:
       run: docker run --rm -d --name cassandra -p 9042:9042 -v ${GITHUB_WORKSPACE}/spec/databases/cassandra/schema:/docker-entrypoint-initdb.d  cassandra:${{ matrix.cassandra-version }}
     - name: Create SQLServer Container
       run: docker run --rm -d --name sqlserver -p 1433:1433 -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password12!" -e "MSSQL_COLLATION=${{ matrix.sqlserver-collation }}" -v ${GITHUB_WORKSPACE}/spec/databases/sqlserver/schema:/docker-entrypoint-initdb.d mcr.microsoft.com/mssql/server:2017-latest
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
