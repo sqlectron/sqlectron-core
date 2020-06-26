@@ -33,7 +33,7 @@ export default async function (server, database) {
   logger().debug('connected');
   const defaultSchema = await getSchema(conn);
 
-  const version = (await driverExecuteQuery(conn, { query: 'SHOW server_version;' })).rows[0].server_version;
+  const version = (await driverExecuteQuery(conn, { query: 'select version()' })).rows[0].version;
 
   return {
     /* eslint max-len:0 */
