@@ -31,9 +31,10 @@ describe('db', () => {
     throw new Error('Invalid selected db client for tests');
   }
 
-  if (~dbClients.indexOf('sqlite')) {
+  if (dbClients.includes('sqlite')) {
     setupSQLite(config.sqlite);
-  } else if (~dbClients.indexOf('cassandra')) {
+  }
+  if (dbClients.includes('cassandra')) {
     setupCassandra(config.cassandra);
   }
 

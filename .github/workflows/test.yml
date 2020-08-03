@@ -45,28 +45,12 @@ jobs:
             sqlserver-collation: Latin1_General_CS_AS
 
     env:
-      CASSANDRA_PORT: tcp://localhost:9042
-      POSTGRES_PORT: tcp://localhost:5432
-      POSTGRES_ENV_POSTGRES_USER: postgres
-      POSTGRES_ENV_POSTGRES_PASSWORD: Password12!
-      POSTGRES_ENV_POSTGRES_DB: sqlectron
-      PGUSER: postgres
-      PGPASSWORD: Password12!
-      MYSQL_PORT: tcp://localhost:3306
-      MYSQL_ENV_MYSQL_USER: root
-      MYSQL_ENV_MYSQL_PASSWORD: Password12!
-      MYSQL_ENV_MYSQL_DATABASE: sqlectron
-      MYSQL_PWD: Password12!
-      MARIADB_PORT: tcp://localhost:3307
-      MARIADB_ENV_MARIADB_USER: root
-      MARIADB_ENV_MARIADB_PASSWORD: Password12!
-      MARIADB_ENV_MARIADB_DATABASE: sqlectron
-      MARIADB_PWD: Password12!
-      SQLSERVER_ENV_SQLSERVER_HOST: localhost
-      SQLSERVER_ENV_SQLSERVER_PORT: 1433
-      SQLSERVER_ENV_SQLSERVER_USER: sa
-      SQLSERVER_ENV_SQLSERVER_PASSWORD: Password12!
-      SQLSERVER_ENV_SQLSERVER_DATABASE: sqlectron
+      CASSANDRA_DSN: cassandra://localhost:9042
+      POSTGRES_DSN: postgres://postgres:Password12!@localhost:5432/?dbname=sqlectron
+      MYSQL_DSN: mysql://root:Password12!@localhost:3306/?dbname=sqlectron
+      MARIADB_DSN: mysql://root:Password12!@localhost:3307/?dbname=sqlectron
+      SQLSERVER_DSN: sqlserver://sa:Password12!@localhost:1433/?dbname=sqlectron
+      SQLITE_DSN: sqlite:/tmp/sqlite/sqlectron.sqlite3
 
     steps:
     - uses: actions/checkout@v2
