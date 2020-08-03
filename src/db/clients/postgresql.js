@@ -34,11 +34,17 @@ export default async function (server, database) {
   const defaultSchema = await getSchema(conn);
 
   const version = (await driverExecuteQuery(conn, { query: 'select version()' })).rows[0].version;
+  const splitVersion = version.split(' ');
+  const versionDetails = {
+    name: splitVersion[0],
+    version: splitVersion[1],
+    string: version,
+  };
 
   return {
     /* eslint max-len:0 */
     wrapIdentifier,
-    version,
+    getVersion: () => versionDetails,
     disconnect: () => disconnect(conn),
     listTables: (db, filter) => listTables(conn, filter),
     listViews: (filter) => listViews(conn, filter),

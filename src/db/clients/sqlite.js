@@ -18,10 +18,15 @@ export default async function (server, database) {
 
   // light solution to test connection with with the server
   const version = (await driverExecuteQuery(conn, { query: 'SELECT sqlite_version() as version' })).data[0].version;
+  const versionData = {
+    name: 'SQLite',
+    version,
+    string: `SQLite ${version}`,
+  };
 
   return {
     wrapIdentifier,
-    version,
+    getVersion: () => versionData,
     disconnect: () => disconnect(conn),
     listTables: () => listTables(conn),
     listViews: () => listViews(conn),

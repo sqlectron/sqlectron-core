@@ -94,8 +94,18 @@ describe('db', () => {
 
         describe('.version', () => {
           it('should return a version', async () => {
-            expect(dbConn.version()).to.be.a('string');
-            expect(dbConn.version()).to.not.be.empty;
+            const version = dbConn.getVersion();
+            console.log(version);
+            expect(dbConn.getVersion()).to.be.a('object');
+            const expectedName = {
+              postgres: 'PostgreSQL',
+              mysql: 'MySQL',
+              mariadb: 'MariaDB',
+              sqlite: 'SQLite',
+            };
+            expect(version).to.have.property('name').to.contain(expectedName[dbClient]);
+            expect(version).to.have.property('version').to.be.a('string').and.to.match(/(?:[0-9]\.)+/);
+            expect(version).to.have.property('string').to.be.a('string').and.to.be.not.empty;
           });
         });
 

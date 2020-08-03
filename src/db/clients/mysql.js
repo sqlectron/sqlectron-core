@@ -21,12 +21,27 @@ export default async function (server, database) {
     pool: mysql.createPool(dbConfig),
   };
 
-  // light solution to test connection with with the server
-  const version = (await driverExecuteQuery(conn, { query: 'select version() as version;' })).data[0].version;
+  const versionInfo = (await driverExecuteQuery(conn, { query: "SHOW VARIABLES WHERE variable_name='version' OR variable_name='version_comment';" })).data;
+  const versionData = {
+    name: '',
+    version: '',
+    string: '',
+  };
+
+  for (let i = 0; i < versionInfo.length; i++) {
+    const item = versionInfo[i];
+    if (item.Variable_name === 'version') {
+      versionData.version = item.Value;
+    } else if (item.Variable_name === 'version_comment') {
+      versionData.name = item.Value;
+    }
+  }
+  versionData.string = `${versionData.name} ${versionData.version}`;
+  versionData.version = versionData.version.split('-')[0];
 
   return {
     wrapIdentifier,
-    version,
+    getVersion: () => versionData,
     disconnect: () => disconnect(conn),
     listTables: () => listTables(conn),
     listViews: () => listViews(conn),
