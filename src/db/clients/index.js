@@ -37,6 +37,15 @@ export const CLIENTS = [
     ],
   },
   {
+    key: 'redshift',
+    name: 'Redshift',
+    defaultDatabase: 'postgres',
+    defaultPort: 5432,
+    disabledFeatures: [
+      'server:domain',
+    ],
+  },
+  {
     key: 'sqlserver',
     name: 'Microsoft SQL Server',
     defaultPort: 1433,
@@ -79,6 +88,7 @@ export default {
   mysql,
   mariadb: mysql,
   postgresql,
+  redshift: postgresql,
   sqlserver,
   sqlite,
   cassandra,

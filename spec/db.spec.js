@@ -15,6 +15,7 @@ chai.use(chaiAsPromised);
 const SUPPORTED_DB_CLIENTS = db.CLIENTS.map((client) => client.key);
 
 const dbSchemas = {
+  redshift: 'public',
   postgresql: 'public',
   sqlserver: 'dbo',
 };
@@ -24,6 +25,7 @@ const dbSchemas = {
  */
 const dbsToTest = (process.env.DB_CLIENTS || '').split(',').filter((client) => !!client);
 
+const postgresClients = ['postgresql', 'redshift'];
 
 describe('db', () => {
   const dbClients = dbsToTest.length ? dbsToTest : SUPPORTED_DB_CLIENTS;
@@ -113,7 +115,7 @@ describe('db', () => {
         describe('.listTables', () => {
           it('should list all tables', async () => {
             const tables = await dbConn.listTables({ schema: dbSchema });
-            if (dbClient === 'postgresql' || dbClient === 'sqlserver') {
+            if (postgresClients.includes(dbClient) || dbClient === 'sqlserver') {
               expect(tables).to.eql([
                 { schema: dbSchema, name: 'roles' },
                 { schema: dbSchema, name: 'users' },
@@ -131,7 +133,7 @@ describe('db', () => {
           describe('.listViews', () => {
             it('should list all views', async () => {
               const views = await dbConn.listViews({ schema: dbSchema });
-              if (dbClient === 'postgresql' || dbClient === 'sqlserver') {
+              if (postgresClients.includes(dbClient) || dbClient === 'sqlserver') {
                 expect(views).to.eql([
                   { schema: dbSchema, name: 'email_view' },
                 ]);
@@ -156,7 +158,15 @@ describe('db', () => {
               expect(routines).to.have.length(2);
               expect(routine).to.have.deep.property('routineType').to.eql('FUNCTION');
               expect(routine).to.have.deep.property('schema').to.eql(dbSchema);
+<<<<<<< Updated upstream
             } else if (dbClient === 'mysql' || dbClient === 'mariadb') {
+=======
+            } else if (dbClient === 'redshift') {
+              expect(routines).to.have.length(1);
+              expect(routine).to.have.deep.property('routineType').to.eql('FUNCTION');
+              expect(routine).to.have.deep.property('schema').to.eql(dbSchema);
+            } else if (mysqlClients.includes(dbClient)) {
+>>>>>>> Stashed changes
               expect(routines).to.have.length(1);
               expect(routine).to.have.deep.property('routineType').to.eql('PROCEDURE');
               expect(routine).to.not.have.deep.property('schema');
@@ -194,7 +204,7 @@ describe('db', () => {
             }
 
             // Each database may have different db types
-            if (dbClient === 'postgresql') {
+            if (postgresClients.includes(dbClient)) {
               expect(column('username')).to.have.property('dataType').to.eql('text');
               expect(column('email')).to.have.property('dataType').to.eql('text');
               expect(column('password')).to.have.property('dataType').to.eql('text');
@@ -225,7 +235,7 @@ describe('db', () => {
         describe('.listTableTriggers', () => {
           it('should list all table related triggers', async () => {
             const triggers = await dbConn.listTableTriggers('users');
-            if (dbClient === 'cassandra') {
+            if (dbClient === 'cassandra' || dbClient === 'redshift') {
               expect(triggers).to.have.length(0);
             } else {
               expect(triggers).to.have.length(1);
@@ -242,7 +252,7 @@ describe('db', () => {
             } else if (dbClient === 'sqlite') {
               expect(indexes).to.have.length(1);
               expect(indexes).to.include.members(['users_id_index']);
-            } else if (dbClient === 'postgresql') {
+            } else if (postgresClients.includes(dbClient)) {
               expect(indexes).to.have.length(1);
               expect(indexes).to.include.members(['users_pkey']);
             } else if (dbClient === 'mysql' || dbClient === 'mariadb') {
@@ -260,7 +270,7 @@ describe('db', () => {
         describe('.listSchemas', () => {
           it('should list all schema', async () => {
             const schemas = await dbConn.listSchemas({ schema: { only: [dbSchema, 'dummy_schema'] } });
-            if (dbClient === 'postgresql') {
+            if (postgresClients.includes(dbClient)) {
               expect(schemas).to.have.length(2);
               expect(schemas).to.include.members([dbSchema, 'dummy_schema']);
             } else if (dbClient === 'sqlserver') {
@@ -335,7 +345,7 @@ describe('db', () => {
                 '  KEY `role_id` (`role_id`),\n' +
                 '  CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE\n' +
               ') ENGINE=InnoDB');
-            } else if (dbClient === 'postgresql') {
+            } else if (postgresClients.includes(dbClient)) {
               expect(createScript).to.eql('CREATE TABLE public.users (\n' +
                 '  id integer NOT NULL,\n' +
                 '  username text NOT NULL,\n' +
@@ -384,7 +394,7 @@ describe('db', () => {
               expect(selectQuery).to.eql('SELECT `id`, `username`, `email`, `password`, `role_id`, `createdat` FROM `users`;');
             } else if (dbClient === 'sqlserver') {
               expect(selectQuery).to.eql('SELECT [id], [username], [email], [password], [role_id], [createdat] FROM [users];');
-            } else if (dbClient === 'postgresql' || dbClient === 'sqlite') {
+            } else if (postgresClients.includes(dbClient) || dbClient === 'sqlite') {
               expect(selectQuery).to.eql('SELECT "id", "username", "email", "password", "role_id", "createdat" FROM "users";');
             } else if (dbClient === 'cassandra') {
               expect(selectQuery).to.eql('SELECT "id", "createdat", "email", "password", "role_id", "username" FROM "users";');
@@ -397,7 +407,7 @@ describe('db', () => {
             const selectQuery = await dbConn.getTableSelectScript('users', 'public');
             if (dbClient === 'sqlserver') {
               expect(selectQuery).to.eql('SELECT [id], [username], [email], [password], [role_id], [createdat] FROM [public].[users];');
-            } else if (dbClient === 'postgresql') {
+            } else if (postgresClients.includes(dbClient)) {
               expect(selectQuery).to.eql('SELECT "id", "username", "email", "password", "role_id", "createdat" FROM "public"."users";');
             }
           });
@@ -417,7 +427,7 @@ describe('db', () => {
                 'INSERT INTO [users] ([id], [username], [email], [password], [role_id], [createdat])\n',
                 'VALUES (?, ?, ?, ?, ?, ?);',
               ].join(' '));
-            } else if (dbClient === 'postgresql' || dbClient === 'sqlite') {
+            } else if (postgresClients.includes(dbClient) || dbClient === 'sqlite') {
               expect(insertQuery).to.eql([
                 'INSERT INTO "users" ("id", "username", "email", "password", "role_id", "createdat")\n',
                 'VALUES (?, ?, ?, ?, ?, ?);',
@@ -439,7 +449,7 @@ describe('db', () => {
                 'INSERT INTO [public].[users] ([id], [username], [email], [password], [role_id], [createdat])\n',
                 'VALUES (?, ?, ?, ?, ?, ?);',
               ].join(' '));
-            } else if (dbClient === 'postgresql' || dbClient === 'sqlite') {
+            } else if (postgresClients.includes(dbClient) || dbClient === 'sqlite') {
               expect(insertQuery).to.eql([
                 'INSERT INTO "public"."users" ("id", "username", "email", "password", "role_id", "createdat")\n',
                 'VALUES (?, ?, ?, ?, ?, ?);',
@@ -463,7 +473,7 @@ describe('db', () => {
                 'SET [id]=?, [username]=?, [email]=?, [password]=?, [role_id]=?, [createdat]=?\n',
                 'WHERE <condition>;',
               ].join(' '));
-            } else if (dbClient === 'postgresql' || dbClient === 'sqlite') {
+            } else if (postgresClients.includes(dbClient) || dbClient === 'sqlite') {
               expect(updateQuery).to.eql([
                 'UPDATE "users"\n',
                 'SET "id"=?, "username"=?, "email"=?, "password"=?, "role_id"=?, "createdat"=?\n',
@@ -488,7 +498,7 @@ describe('db', () => {
                 'SET [id]=?, [username]=?, [email]=?, [password]=?, [role_id]=?, [createdat]=?\n',
                 'WHERE <condition>;',
               ].join(' '));
-            } else if (dbClient === 'postgresql' || dbClient === 'sqlite') {
+            } else if (postgresClients.includes(dbClient) || dbClient === 'sqlite') {
               expect(updateQuery).to.eql([
                 'UPDATE "public"."users"\n',
                 'SET "id"=?, "username"=?, "email"=?, "password"=?, "role_id"=?, "createdat"=?\n',
@@ -505,7 +515,7 @@ describe('db', () => {
               expect(deleteQuery).to.contain('DELETE FROM `roles` WHERE <condition>;');
             } else if (dbClient === 'sqlserver') {
               expect(deleteQuery).to.contain('DELETE FROM [roles] WHERE <condition>;');
-            } else if (dbClient === 'postgresql' || dbClient === 'sqlite') {
+            } else if (postgresClients.includes(dbClient) || dbClient === 'sqlite') {
               expect(deleteQuery).to.contain('DELETE FROM "roles" WHERE <condition>;');
             } else if (dbClient === 'cassandra') {
               expect(deleteQuery).to.contain('DELETE FROM "roles" WHERE <condition>;');
@@ -518,7 +528,7 @@ describe('db', () => {
             const deleteQuery = await dbConn.getTableDeleteScript('roles', 'public');
             if (dbClient === 'sqlserver') {
               expect(deleteQuery).to.contain('DELETE FROM [public].[roles] WHERE <condition>;');
-            } else if (dbClient === 'postgresql') {
+            } else if (postgresClients.includes(dbClient)) {
               expect(deleteQuery).to.contain('DELETE FROM "public"."roles" WHERE <condition>;');
             }
           });
@@ -539,6 +549,12 @@ describe('db', () => {
                 'CREATE OR REPLACE VIEW "public".email_view AS',
                 ' SELECT users.email,',
                 '    users.password',
+                '   FROM users;',
+              ].join('\n'));
+            } else if (dbClient === 'redshift') {
+              expect(createScript).to.eql([
+                'CREATE OR REPLACE VIEW "public".email_view AS',
+                ' SELECT users.email, users."password"',
                 '   FROM users;',
               ].join('\n'));
             } else if (dbClient === 'sqlserver') {
@@ -574,6 +590,15 @@ describe('db', () => {
                 'END',
               ].join('\n'));
             } else if (dbClient === 'postgresql') {
+              expect(createScript).to.eql([
+                'CREATE OR REPLACE FUNCTION public.users_count()',
+                ' RETURNS bigint',
+                ' LANGUAGE sql',
+                'AS $function$',
+                '  SELECT COUNT(*) FROM users AS total;',
+                '$function$\n',
+              ].join('\n'));
+            } else if (dbClient === 'redshift') {
               expect(createScript).to.eql([
                 'CREATE OR REPLACE FUNCTION public.users_count()',
                 ' RETURNS bigint',
@@ -750,7 +775,11 @@ describe('db', () => {
               expect(result).to.have.deep.property('rowCount').to.eql(1);
             });
 
+<<<<<<< Updated upstream
             if (dbClient === 'mysql' || dbClient === 'postgresql' || dbClient === 'mariadb') {
+=======
+            if (postgresClients.includes(dbClient) || mysqlClients.includes(dbClient)) {
+>>>>>>> Stashed changes
               it('should not cast DATE types to native JS Date objects', async () => {
                 const results = await dbConn.executeQuery('select createdat from users');
 
@@ -1107,7 +1136,7 @@ describe('db', () => {
             });
           }
 
-          if (dbClient === 'postgresql') {
+          if (postgresClients.includes(dbClient)) {
             describe('EXPLAIN', () => {
               it('should execute a single query', async () => {
                 const results = await dbConn.executeQuery('explain select * from users');
