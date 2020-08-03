@@ -427,12 +427,21 @@ export async function getViewCreateScript(conn, view, schema) {
 
 export async function getRoutineCreateScript(conn, routine, _, schema) {
   const sql = `
+    SELECT prosrc
+    FROM pg_proc p
+    LEFT JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
+    WHERE p.proname = $1
+    AND n.nspname = $2
+  `;
+  /*
+  const sql = `
     SELECT pg_get_functiondef(p.oid)
     FROM pg_proc p
     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
     WHERE proname = $1
     AND n.nspname = $2
   `;
+  */
 
   const params = [
     routine,
@@ -441,7 +450,7 @@ export async function getRoutineCreateScript(conn, routine, _, schema) {
 
   const data = await driverExecuteQuery(conn, { query: sql, params });
 
-  return data.rows.map((row) => row.pg_get_functiondef);
+  return data.rows.map((row) => row.prosrc);
 }
 
 export function wrapIdentifier(value) {
