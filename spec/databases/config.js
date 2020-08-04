@@ -11,7 +11,7 @@ if (process.env.POSTGRES_DSN) {
   const postgres = new ConnectionString(process.env.POSTGRES_DSN, {
     user: 'postgres',
     password: '',
-    database: 'sqlectron',
+    path: ['sqlectron'],
   });
   dbs.postgresql = {
     host: postgres.hostname,
@@ -26,7 +26,7 @@ if (process.env.MYSQL_DSN) {
   const mysql = new ConnectionString(process.env.MYSQL_DSN, {
     user: 'root',
     password: '',
-    database: 'sqlectron',
+    path: ['sqlectron'],
   });
   dbs.mysql = {
     host: mysql.hostname,
@@ -41,7 +41,7 @@ if (process.env.MARIADB_DSN) {
   const mariadb = new ConnectionString(process.env.MARIADB_DSN, {
     user: 'root',
     password: '',
-    database: 'sqlectron',
+    path: ['sqlectron'],
   });
   dbs.mariadb = {
     host: mariadb.hostname,
@@ -56,7 +56,7 @@ if (process.env.SQLSERVER_DSN) {
   const sqlserver = new ConnectionString(process.env.SQLSERVER_DSN, {
     user: 'sa',
     password: '',
-    database: 'sqlectron',
+    path: ['sqlectron'],
   });
   dbs.sqlserver = {
     host: sqlserver.hostname,
@@ -69,7 +69,7 @@ if (process.env.SQLSERVER_DSN) {
 
 if (process.env.CASSANDRA_DSN) {
   const cassandra = new ConnectionString(process.env.CASSANDRA_DSN, {
-    database: 'sqlectron',
+    path: ['sqlectron'],
   });
   dbs.cassandra = {
     host: cassandra.hostname,
