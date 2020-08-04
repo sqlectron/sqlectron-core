@@ -25,11 +25,17 @@ export default function (server, database) {
 
       client.version = client.getState().getConnectedHosts()[0].getCassandraVersion();
 
+      const versionData = {
+        name: 'Cassandra',
+        version: client.getState().getConnectedHosts()[0].cassandraVersion,
+        string: `Cassandra ${client.getState().getConnectedHosts()[0].cassandraVersion}`,
+      };
+
       logger().debug('connected');
       resolve({
         wrapIdentifier,
         version: client.getState().getConnectedHosts()[0].cassandraVersion,
-        getVersion: () => client.getState().getConnectedHosts()[0].cassandraVersion,
+        getVersion: () => versionData,
         disconnect: () => disconnect(client),
         listTables: (db) => listTables(client, db),
         listViews: () => listViews(client),

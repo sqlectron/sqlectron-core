@@ -4,6 +4,7 @@ import { db } from '../src';
 import config from './databases/config';
 import setupSQLite from './databases/sqlite/setup';
 import setupCassandra from './databases/cassandra/setup';
+import { versionCompare } from '../src/utils';
 
 chai.use(chaiAsPromised);
 
@@ -102,7 +103,6 @@ describe('db', () => {
         describe('.getVersion', () => {
           it('should return version details', () => {
             const version = dbConn.getVersion();
-            console.log(version);
             expect(dbConn.getVersion()).to.be.a('object');
             const expectedName = {
               postgres: 'PostgreSQL',
@@ -328,7 +328,7 @@ describe('db', () => {
           it('should return table create script', async () => {
             const [createScript] = await dbConn.getTableCreateScript('users');
 
-            if (dbClient === 'mysql' && parseInt(dbConn.version()[0], 10) >= '8') {
+            if (dbClient === 'mysql' && versionCompare(dbConn.getVersion().version, '8') >= 0) {
               expect(createScript).to.contain('CREATE TABLE `users` (\n' +
               '  `id` int NOT NULL AUTO_INCREMENT,\n' +
               '  `username` varchar(45) DEFAULT NULL,\n' +
@@ -706,7 +706,7 @@ describe('db', () => {
                 }
               } catch (err) {
                 if (dbClient === 'cassandra') {
-                  if (dbConn.version().split('.')[0] === '2') {
+                  if (versionCompare(dbConn.getVersion().version, '2') === 0) {
                     expect(err.message).to.eql('line 0:-1 no viable alternative at input \'<EOF>\'');
                   } else {
                     expect(err.message).to.eql('line 1:13 mismatched character \'<EOF>\' expecting set null');
@@ -811,7 +811,7 @@ describe('db', () => {
                 expect(secondResult).to.have.deep.property('rowCount').to.eql(1);
               } catch (err) {
                 if (dbClient === 'cassandra') {
-                  if (parseFloat(dbConn.version().split('.').slice(0, 2).join('.')) >= 3.10) {
+                  if (versionCompare(dbConn.getVersion().version, '3.10') >= 0) {
                     expect(err.message).to.match(/mismatched input 'select' expecting EOF/);
                   } else {
                     expect(err.message).to.match(/missing EOF at 'select'/);
@@ -891,7 +891,7 @@ describe('db', () => {
                 }
               } catch (err) {
                 if (dbClient === 'cassandra') {
-                  if (parseFloat(dbConn.version().split('.').slice(0, 2).join('.')) >= 3.10) {
+                  if (versionCompare(dbConn.getVersion().version, '3.10') >= 0) {
                     expect(err.message).to.match(/mismatched input 'insert' expecting EOF/);
                   } else {
                     expect(err.message).to.match(/missing EOF at 'insert'/);
@@ -967,7 +967,7 @@ describe('db', () => {
                 }
               } catch (err) {
                 if (dbClient === 'cassandra') {
-                  if (parseFloat(dbConn.version().split('.').slice(0, 2).join('.')) >= 3.10) {
+                  if (versionCompare(dbConn.getVersion().version, '3.10') >= 0) {
                     expect(err.message).to.match(/mismatched input 'delete' expecting EOF/);
                   } else {
                     expect(err.message).to.match(/missing EOF at 'delete'/);
@@ -1043,7 +1043,7 @@ describe('db', () => {
                 }
               } catch (err) {
                 if (dbClient === 'cassandra') {
-                  if (parseFloat(dbConn.version().split('.').slice(0, 2).join('.')) >= 3.10) {
+                  if (versionCompare(dbConn.version().version, '3.10') >= 0) {
                     expect(err.message).to.match(/mismatched input 'update' expecting EOF/);
                   } else {
                     expect(err.message).to.match(/missing EOF at 'update'/);

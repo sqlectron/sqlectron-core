@@ -21,23 +21,38 @@ export default async function (server, database) {
     pool: mysql.createPool(dbConfig),
   };
 
-  const versionInfo = (await driverExecuteQuery(conn, { query: "SHOW VARIABLES WHERE variable_name='version' OR variable_name='version_comment';" })).data;
-  const versionData = {
-    name: '',
-    version: '',
-    string: '',
-  };
+  const versionInfo = (await driverExecuteQuery(conn, {
+    query: "SHOW VARIABLES WHERE variable_name='version' OR variable_name='version_comment';",
+  })).data;
 
+  let version;
+  let versionComment;
   for (let i = 0; i < versionInfo.length; i++) {
     const item = versionInfo[i];
     if (item.Variable_name === 'version') {
-      versionData.version = item.Value;
+      version = item.Value;
     } else if (item.Variable_name === 'version_comment') {
-      versionData.name = item.Value;
+      versionComment = item.Value;
     }
   }
-  versionData.string = `${versionData.name} ${versionData.version}`;
-  versionData.version = versionData.version.split('-')[0];
+
+  const versionData = {
+    name: versionComment,
+    version: version.split('-')[0],
+    string: `${versionComment} ${version}`,
+  };
+
+  // normalize the name as depending on where the server is installed from, it
+  // could be just "MySQL" or "MariaDB", or it could be a longer string like
+  // "mariadb.org binary distribution"
+  const lowerComment = versionComment.toLowerCase();
+  if (lowerComment.includes('mysql')) {
+    versionData.name = 'MySQL';
+  } else if (lowerComment.includes('mariadb')) {
+    versionData.name = 'MariaDB';
+  } else if (lowerComment.includes('percona')) {
+    versionData.name = 'Percona';
+  }
 
   return {
     wrapIdentifier,
@@ -188,7 +203,10 @@ export async function getTableReferences(conn, table) {
 
 export async function getTableKeys(conn, database, table) {
   const sql = `
-    SELECT constraint_name as 'constraint_name', column_name as 'column_name', referenced_table_name as 'referenced_table_name',
+    SELECT
+      constraint_name as 'constraint_name',
+      column_name as 'column_name',
+      referenced_table_name as 'referenced_table_name',
       CASE WHEN (referenced_table_name IS NOT NULL) THEN 'FOREIGN'
       ELSE constraint_name
       END as key_type
