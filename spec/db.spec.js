@@ -105,7 +105,7 @@ describe('db', () => {
             const version = dbConn.getVersion();
             expect(dbConn.getVersion()).to.be.a('object');
             const expectedName = {
-              postgres: 'PostgreSQL',
+              postgresql: 'PostgreSQL',
               mysql: 'MySQL',
               mariadb: 'MariaDB',
               sqlite: 'SQLite',
@@ -113,7 +113,7 @@ describe('db', () => {
               cassandra: 'Cassandra',
             };
             expect(version).to.have.property('name').to.contain(expectedName[dbClient]);
-            expect(version).to.have.property('version').to.be.a('string').and.to.match(/(?:[0-9]\.)+/);
+            expect(version).to.have.property('version').to.be.a('string').and.to.match(/(?:[0-9]\.?)+/);
             expect(version).to.have.property('string').to.be.a('string').and.to.be.not.empty;
           });
         });
@@ -1045,7 +1045,7 @@ describe('db', () => {
                 }
               } catch (err) {
                 if (dbClient === 'cassandra') {
-                  if (versionCompare(dbConn.version().version, '3.10') >= 0) {
+                  if (versionCompare(dbConn.getVersion().version, '3.10') >= 0) {
                     expect(err.message).to.match(/mismatched input 'update' expecting EOF/);
                   } else {
                     expect(err.message).to.match(/missing EOF at 'update'/);
