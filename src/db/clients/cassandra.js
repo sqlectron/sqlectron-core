@@ -23,12 +23,13 @@ export default function (server, database) {
         return reject(err);
       }
 
-      client.version = client.getState().getConnectedHosts()[0].cassandraVersion;
+      client.version = client.getState().getConnectedHosts()[0].getCassandraVersion();
 
       logger().debug('connected');
       resolve({
         wrapIdentifier,
-        version: client.version,
+        version: client.getState().getConnectedHosts()[0].cassandraVersion,
+        getVersion: () => client.getState().getConnectedHosts()[0].cassandraVersion,
         disconnect: () => disconnect(client),
         listTables: (db) => listTables(client, db),
         listViews: () => listViews(client),
@@ -60,7 +61,7 @@ export function disconnect(client) {
 export function listTables(client, database) {
   return new Promise((resolve, reject) => {
     let sql;
-    if (client.version.split('.')[0] === '2') {
+    if (client.version[0] === 2) {
       sql = `
         SELECT columnfamily_name as name
         FROM system.schema_columnfamilies
@@ -91,7 +92,7 @@ export function listRoutines() {
 }
 
 export function listTableColumns(client, database, table) {
-  const cassandra2 = client.version.split('.')[0] === '2';
+  const cassandra2 = client.version[0] === 2;
   return new Promise((resolve, reject) => {
     let sql;
     if (cassandra2) {

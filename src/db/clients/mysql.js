@@ -41,6 +41,7 @@ export default async function (server, database) {
 
   return {
     wrapIdentifier,
+    version: versionData.version,
     getVersion: () => versionData,
     disconnect: () => disconnect(conn),
     listTables: () => listTables(conn),

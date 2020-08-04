@@ -93,7 +93,14 @@ describe('db', () => {
         });
 
         describe('.version', () => {
-          it('should return a version', async () => {
+          it('should return version string', () => {
+            const version = dbConn.version();
+            expect(version).to.be.a.string.and.not.be.empty;
+          });
+        });
+
+        describe('.getVersion', () => {
+          it('should return version details', () => {
             const version = dbConn.getVersion();
             console.log(version);
             expect(dbConn.getVersion()).to.be.a('object');

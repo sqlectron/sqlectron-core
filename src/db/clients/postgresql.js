@@ -44,6 +44,7 @@ export default async function (server, database) {
   return {
     /* eslint max-len:0 */
     wrapIdentifier,
+    version,
     getVersion: () => versionDetails,
     disconnect: () => disconnect(conn),
     listTables: (db, filter) => listTables(conn, filter),
