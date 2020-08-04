@@ -11,7 +11,7 @@ if (process.env.POSTGRES_DSN) {
   const postgres = new ConnectionString(process.env.POSTGRES_DSN, {
     user: 'postgres',
     password: '',
-    database: 'sqlectron'
+    database: 'sqlectron',
   });
   dbs.postgresql = {
     host: postgres.hostname,
