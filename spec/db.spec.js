@@ -109,6 +109,8 @@ describe('db', () => {
               mysql: 'MySQL',
               mariadb: 'MariaDB',
               sqlite: 'SQLite',
+              sqlserver: 'SQL Server',
+              cassandra: 'Cassandra',
             };
             expect(version).to.have.property('name').to.contain(expectedName[dbClient]);
             expect(version).to.have.property('version').to.be.a('string').and.to.match(/(?:[0-9]\.)+/);
