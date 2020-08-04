@@ -146,3 +146,29 @@ export function createCancelablePromise(error, timeIdle = 100) {
     },
   };
 }
+
+/**
+ * Compares two version strings.
+ *
+ * For two version strings, this fucntion will return -1 if the first version is smaller
+ * than the second version, 0 if they are equal, and 1 if the second version is smaller.
+ * However, this function will only compare up-to the smallest part of the version string
+ * defined between the two, such '8' and '8.0.2' will be considered equal.
+ *
+ * @param {string} a
+ * @param {string} b
+ * @returns {boolean}
+ */
+export function versionCompare(a, b) {
+  const fullA = a.split('.').map((val) => parseInt(val, 10));
+  const fullB = b.split('.').map((val) => parseInt(val, 10));
+
+  for (let i = 0; i < Math.min(fullA.length, fullB.length); i++) {
+    if (fullA[i] > fullB[i]) {
+      return 1;
+    } else if (fullA[i] < fullB[i]) {
+      return -1;
+    }
+  }
+  return 0;
+}
