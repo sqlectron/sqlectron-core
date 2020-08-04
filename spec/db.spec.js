@@ -23,7 +23,7 @@ const dbSchemas = {
  * List of selected databases to be tested in the current task
  */
 const dbsToTest = (process.env.DB_CLIENTS || '').split(',').filter((client) => !!client);
-
+const mysqlClients = ['mysql', 'mariadb'];
 
 describe('db', () => {
   const dbClients = dbsToTest.length ? dbsToTest : SUPPORTED_DB_CLIENTS;
@@ -156,7 +156,7 @@ describe('db', () => {
               expect(routines).to.have.length(2);
               expect(routine).to.have.deep.property('routineType').to.eql('FUNCTION');
               expect(routine).to.have.deep.property('schema').to.eql(dbSchema);
-            } else if (dbClient === 'mysql' || dbClient === 'mariadb') {
+            } else if (mysqlClients.includes(dbClient)) {
               expect(routines).to.have.length(1);
               expect(routine).to.have.deep.property('routineType').to.eql('PROCEDURE');
               expect(routine).to.not.have.deep.property('schema');
@@ -245,7 +245,7 @@ describe('db', () => {
             } else if (dbClient === 'postgresql') {
               expect(indexes).to.have.length(1);
               expect(indexes).to.include.members(['users_pkey']);
-            } else if (dbClient === 'mysql' || dbClient === 'mariadb') {
+            } else if (mysqlClients.includes(dbClient)) {
               expect(indexes).to.have.length(2);
               expect(indexes).to.include.members(['PRIMARY', 'role_id']);
             } else if (dbClient === 'sqlserver') {
@@ -380,7 +380,7 @@ describe('db', () => {
         describe('.getTableSelectScript', () => {
           it('should return SELECT table script', async () => {
             const selectQuery = await dbConn.getTableSelectScript('users');
-            if (dbClient === 'mysql' || dbClient === 'mariadb') {
+            if (mysqlClients.includes(dbClient)) {
               expect(selectQuery).to.eql('SELECT `id`, `username`, `email`, `password`, `role_id`, `createdat` FROM `users`;');
             } else if (dbClient === 'sqlserver') {
               expect(selectQuery).to.eql('SELECT [id], [username], [email], [password], [role_id], [createdat] FROM [users];');
@@ -407,7 +407,7 @@ describe('db', () => {
         describe('.getTableInsertScript', () => {
           it('should return INSERT INTO table script', async () => {
             const insertQuery = await dbConn.getTableInsertScript('users');
-            if (dbClient === 'mysql' || dbClient === 'mariadb') {
+            if (mysqlClients.includes(dbClient)) {
               expect(insertQuery).to.eql([
                 'INSERT INTO `users` (`id`, `username`, `email`, `password`, `role_id`, `createdat`)\n',
                 'VALUES (?, ?, ?, ?, ?, ?);',
@@ -527,8 +527,7 @@ describe('db', () => {
         describe('.getViewCreateScript', () => {
           it('should return CREATE VIEW script', async () => {
             const [createScript] = await dbConn.getViewCreateScript('email_view');
-
-            if (dbClient === 'mysql' || dbClient === 'mariadb') {
+            if (mysqlClients.includes(dbClient)) {
               expect(createScript).to.contain([
                 'VIEW `email_view`',
                 'AS select `users`.`email` AS `email`,`users`.`password` AS `password`',
@@ -565,7 +564,7 @@ describe('db', () => {
           it('should return CREATE PROCEDURE/FUNCTION script', async () => {
             const [createScript] = await dbConn.getRoutineCreateScript('users_count', 'Procedure');
 
-            if (dbClient === 'mysql' || dbClient === 'mariadb') {
+            if (mysqlClients.includes(dbClient)) {
               expect(createScript).to.contain('CREATE DEFINER=');
               expect(createScript).to.contain([
                 'PROCEDURE `users_count`()',
@@ -750,7 +749,7 @@ describe('db', () => {
               expect(result).to.have.deep.property('rowCount').to.eql(1);
             });
 
-            if (dbClient === 'mysql' || dbClient === 'postgresql' || dbClient === 'mariadb') {
+            if (dbClient === 'postgresql' || mysqlClients.includes(dbClient)) {
               it('should not cast DATE types to native JS Date objects', async () => {
                 const results = await dbConn.executeQuery('select createdat from users');
 
