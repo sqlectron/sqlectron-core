@@ -36,7 +36,7 @@ export default async function (server, database) {
     }
   }
 
-  const versionData = {
+  conn.versionData = {
     name: versionComment,
     version: version.split('-')[0],
     string: `${versionComment} ${version}`,
@@ -47,17 +47,17 @@ export default async function (server, database) {
   // "mariadb.org binary distribution"
   const lowerComment = versionComment.toLowerCase();
   if (lowerComment.includes('mysql')) {
-    versionData.name = 'MySQL';
+    conn.versionData.name = 'MySQL';
   } else if (lowerComment.includes('mariadb')) {
-    versionData.name = 'MariaDB';
+    conn.versionData.name = 'MariaDB';
   } else if (lowerComment.includes('percona')) {
-    versionData.name = 'Percona';
+    conn.versionData.name = 'Percona';
   }
 
   return {
     wrapIdentifier,
-    version: versionData.version,
-    getVersion: () => versionData,
+    version: conn.versionData.version,
+    getVersion: () => conn.versionData,
     disconnect: () => disconnect(conn),
     listTables: () => listTables(conn),
     listViews: () => listViews(conn),
