@@ -96,7 +96,7 @@ describe('db', () => {
         describe('.version', () => {
           it('should return version string', () => {
             const version = dbConn.version();
-            expect(version).to.be.a.string.and.not.be.empty;
+            expect(version).to.be.a('string').and.not.be.empty;
           });
         });
 
