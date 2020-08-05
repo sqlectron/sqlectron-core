@@ -44,14 +44,6 @@ jobs:
             postgres-version: 9
             sqlserver-collation: Latin1_General_CS_AS
 
-    env:
-      CASSANDRA_DSN: cassandra://localhost:9042
-      POSTGRES_DSN: postgres://postgres:Password12!@localhost:5432/?dbname=sqlectron
-      MYSQL_DSN: mysql://root:Password12!@localhost:3306/?dbname=sqlectron
-      MARIADB_DSN: mysql://root:Password12!@localhost:3307/?dbname=sqlectron
-      SQLSERVER_DSN: sqlserver://sa:Password12!@localhost:1433/?dbname=sqlectron
-      SQLITE_DSN: sqlite:/tmp/sqlite/sqlectron.sqlite3
-
     steps:
     - uses: actions/checkout@v2
 
