@@ -20,9 +20,16 @@ export default async function (server, database) {
   // light solution to test connection with with the server
   const version = (await driverExecuteQuery(conn, { query: 'SELECT @@version as \'version\'' })).data[0].version;
 
+  conn.versionData = {
+    name: 'SQL Server',
+    version: version.match(/^Microsoft SQL Server ([0-9]{4})/)[1],
+    string: version,
+  };
+
   return {
     wrapIdentifier,
     version,
+    getVersion: () => conn.versionData,
     disconnect: () => disconnect(conn),
     listTables: (db, filter) => listTables(conn, filter),
     listViews: (filter) => listViews(conn, filter),
