@@ -7,7 +7,7 @@ const dbs = {
   },
 };
 
-const postgres = new ConnectionString(process.env.POSTGRES_DSN || '', {
+const postgres = new ConnectionString(process.env.POSTGRES_DSN, {
   protocol: 'postgres',
   user: 'postgres',
   password: 'Password12!',
@@ -22,7 +22,7 @@ dbs.postgresql = {
   database: postgres.path && postgres.path[0],
 };
 
-const mysql = new ConnectionString(process.env.MYSQL_DSN || '', {
+const mysql = new ConnectionString(process.env.MYSQL_DSN, {
   protocol: 'mysql',
   user: 'root',
   password: 'Password12!',
@@ -37,7 +37,7 @@ dbs.mysql = {
   database: mysql.path && mysql.path[0],
 };
 
-const mariadb = new ConnectionString(process.env.MARIADB_DSN || '', {
+const mariadb = new ConnectionString(process.env.MARIADB_DSN, {
   user: 'root',
   password: 'Password12!',
   path: ['sqlectron'],
@@ -51,7 +51,7 @@ dbs.mariadb = {
   database: mariadb.path && mariadb.path[0],
 };
 
-const sqlserver = new ConnectionString(process.env.SQLSERVER_DSN || '', {
+const sqlserver = new ConnectionString(process.env.SQLSERVER_DSN, {
   protocol: 'mssql',
   user: 'sa',
   password: 'Password12!',
@@ -66,7 +66,7 @@ dbs.sqlserver = {
   database: sqlserver.path && sqlserver.path[0],
 };
 
-const cassandra = new ConnectionString(process.env.CASSANDRA_DSN || '', {
+const cassandra = new ConnectionString(process.env.CASSANDRA_DSN, {
   protocol: 'cassandra',
   path: ['sqlectron'],
   hosts: [{ name: 'localhost', port: 9042 }],
