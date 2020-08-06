@@ -6,7 +6,7 @@ services:
     ports:
       - 3306:3306
     environment:
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: Password12!
       MYSQL_DATABASE: sqlectron
     volumes:
       - ./spec/databases/mysql/schema:/docker-entrypoint-initdb.d
@@ -16,8 +16,8 @@ services:
     ports:
       - 3307:3306
     environment:
+      MYSQL_ROOT_PASSWORD: Password12!
       MYSQL_DATABASE: sqlectron
-      MYSQL_ROOT_PASSWORD: sqlectron
     volumes:
       - ./spec/databases/mysql/schema:/docker-entrypoint-initdb.d
 
@@ -26,8 +26,7 @@ services:
     ports:
       - 5432
     environment:
-      POSTGRES_USER: sqlectron
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: Password12!
       POSTGRES_DB: sqlectron
     volumes:
       - ./spec/databases/postgresql/schema:/docker-entrypoint-initdb.d
