@@ -3,7 +3,7 @@ import { identify } from 'sql-query-identifier';
 
 import { buildDatabseFilter, buildSchemaFilter } from './utils';
 import createLogger from '../../logger';
-import { createCancelablePromise } from '../../utils';
+import { createCancelablePromise, versionCompare } from '../../utils';
 import errors from '../../errors';
 
 const logger = createLogger('db:clients:postgresql');
@@ -434,22 +434,26 @@ export async function getViewCreateScript(conn, view, schema) {
 }
 
 export async function getRoutineCreateScript(conn, routine, _, schema) {
-  const sql = `
+  let mapFunction;
+  let sql;
+  if (versionCompare(conn.versionData.version, '8.4') >= 0) {
+    sql = `
+      SELECT pg_get_functiondef(p.oid)
+      FROM pg_proc p
+      LEFT JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
+      WHERE proname = $1
+      AND n.nspname = $2
+    `;
+    mapFunction = (row) => row.pg_get_functiondef;
+  } else {
+    sql = `
     SELECT prosrc
     FROM pg_proc p
     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
     WHERE p.proname = $1
     AND n.nspname = $2
   `;
-  /*
-  const sql = `
-    SELECT pg_get_functiondef(p.oid)
-    FROM pg_proc p
-    LEFT JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
-    WHERE proname = $1
-    AND n.nspname = $2
-  `;
-  */
+  }
 
   const params = [
     routine,
@@ -458,7 +462,7 @@ export async function getRoutineCreateScript(conn, routine, _, schema) {
 
   const data = await driverExecuteQuery(conn, { query: sql, params });
 
-  return data.rows.map((row) => row.prosrc);
+  return data.rows.map(mapFunction);
 }
 
 export function wrapIdentifier(value) {

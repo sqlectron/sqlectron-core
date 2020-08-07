@@ -596,6 +596,8 @@ describe('db', () => {
           it('should return CREATE PROCEDURE/FUNCTION script', async () => {
             const [createScript] = await dbConn.getRoutineCreateScript('users_count', 'Procedure');
 
+            console.log(createScript);
+
             if (mysqlClients.includes(dbClient)) {
               expect(createScript).to.contain('CREATE DEFINER=');
               expect(createScript).to.contain([
