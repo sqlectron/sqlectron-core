@@ -21,12 +21,43 @@ export default async function (server, database) {
     pool: mysql.createPool(dbConfig),
   };
 
-  // light solution to test connection with with the server
-  const version = (await driverExecuteQuery(conn, { query: 'select version() as version;' })).data[0].version;
+  const versionInfo = (await driverExecuteQuery(conn, {
+    query: "SHOW VARIABLES WHERE variable_name='version' OR variable_name='version_comment';",
+  })).data;
+
+  let version;
+  let versionComment;
+  for (let i = 0; i < versionInfo.length; i++) {
+    const item = versionInfo[i];
+    if (item.Variable_name === 'version') {
+      version = item.Value;
+    } else if (item.Variable_name === 'version_comment') {
+      versionComment = item.Value;
+    }
+  }
+
+  conn.versionData = {
+    name: versionComment,
+    version: version.split('-')[0],
+    string: `${versionComment} ${version}`,
+  };
+
+  // normalize the name as depending on where the server is installed from, it
+  // could be just "MySQL" or "MariaDB", or it could be a longer string like
+  // "mariadb.org binary distribution"
+  const lowerComment = versionComment.toLowerCase();
+  if (lowerComment.includes('mysql')) {
+    conn.versionData.name = 'MySQL';
+  } else if (lowerComment.includes('mariadb')) {
+    conn.versionData.name = 'MariaDB';
+  } else if (lowerComment.includes('percona')) {
+    conn.versionData.name = 'Percona';
+  }
 
   return {
     wrapIdentifier,
-    version,
+    version: conn.versionData.version,
+    getVersion: () => conn.versionData,
     disconnect: () => disconnect(conn),
     listTables: () => listTables(conn),
     listViews: () => listViews(conn),
@@ -172,7 +203,10 @@ export async function getTableReferences(conn, table) {
 
 export async function getTableKeys(conn, database, table) {
   const sql = `
-    SELECT constraint_name as 'constraint_name', column_name as 'column_name', referenced_table_name as 'referenced_table_name',
+    SELECT
+      constraint_name as 'constraint_name',
+      column_name as 'column_name',
+      referenced_table_name as 'referenced_table_name',
       CASE WHEN (referenced_table_name IS NOT NULL) THEN 'FOREIGN'
       ELSE constraint_name
       END as key_type

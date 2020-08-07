@@ -19,6 +19,7 @@ export function createConnection(server, database) {
     connect: connect.bind(null, server, database),
     disconnect: disconnect.bind(null, server, database),
     version: version.bind(null, server, database),
+    getVersion: getVersion.bind(null, server, database),
     listTables: listTables.bind(null, server, database),
     listViews: listViews.bind(null, server, database),
     listRoutines: listRoutines.bind(null, server, database),
@@ -120,9 +121,17 @@ function disconnect(server, database) {
   }
 }
 
+/**
+ * @deprecated
+ */
 function version(server, database) {
   checkIsConnected(server, database);
   return database.connection.version;
+}
+
+function getVersion(server, database) {
+  checkIsConnected(server, database);
+  return database.connection.getVersion();
 }
 
 function listSchemas(server, database, filter) {
