@@ -58,7 +58,7 @@ jobs:
     - name: Create Postgres Container
       run: docker run --rm -d --name postgres -e "POSTGRES_PASSWORD=Password12!" -e "POSTGRES_DB=sqlectron" -p 5432:5432 -v ${GITHUB_WORKSPACE}/spec/databases/postgresql/schema:/docker-entrypoint-initdb.d postgres:${{ matrix.postgres-version }}
     - name: Create Redshift Container
-      run: docker run --rm -d --name redshift -e "POSTGRES_PASSWORD=Password12!" -e "POSTGRES_DB=sqlectron" -p 5433:5432 -v ${GITHUB_WORKSPACE}/spec/databases/redshift/schema:/docker-entrypoint-initdb.d foundryai/postgres8:${{ matrix.redshift-version }}
+      run: docker run --rm -d --name redshift -e "POSTGRES_PASSWORD=Password12!" -e "POSTGRES_DB=sqlectron" -p 5433:5432 -v ${GITHUB_WORKSPACE}/spec/databases/redshift/schema:/docker-entrypoint-initdb.d foundryai/postgres8:${{ env.redshift-version }}
 
     - name: Create Cassandra Container
       run: docker run --rm -d --name cassandra -p 9042:9042 -v ${GITHUB_WORKSPACE}/spec/databases/cassandra/schema:/docker-entrypoint-initdb.d  cassandra:${{ matrix.cassandra-version }}
