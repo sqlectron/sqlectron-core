@@ -10,6 +10,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      redshift-version: redshift
+
     strategy:
       matrix:
         include:
@@ -51,10 +54,15 @@ jobs:
       run: docker run --rm -d --name mysql -e "MYSQL_ROOT_PASSWORD=Password12!" -e "MYSQL_DATABASE=sqlectron" -p 3306:3306 -v ${GITHUB_WORKSPACE}/spec/databases/mysql/schema:/docker-entrypoint-initdb.d mysql:${{ matrix.mysql-version }}
     - name: Create MariaDB Container
       run: docker run --rm -d --name mariadb -e "MYSQL_ROOT_PASSWORD=Password12!" -e "MYSQL_DATABASE=sqlectron" -p 3307:3306 -v ${GITHUB_WORKSPACE}/spec/databases/mysql/schema:/docker-entrypoint-initdb.d mariadb:${{ matrix.maraidb-version }}
+
     - name: Create Postgres Container
       run: docker run --rm -d --name postgres -e "POSTGRES_PASSWORD=Password12!" -e "POSTGRES_DB=sqlectron" -p 5432:5432 -v ${GITHUB_WORKSPACE}/spec/databases/postgresql/schema:/docker-entrypoint-initdb.d postgres:${{ matrix.postgres-version }}
+    - name: Create Redshift Container
+      run: docker run --rm -d --name redshift -e "POSTGRES_PASSWORD=Password12!" -e "POSTGRES_DB=sqlectron" -p 5433:5432 -v ${GITHUB_WORKSPACE}/spec/databases/redshift/schema:/docker-entrypoint-initdb.d foundryai/postgres8:${{ matrix.redshift-version }}
+
     - name: Create Cassandra Container
       run: docker run --rm -d --name cassandra -p 9042:9042 -v ${GITHUB_WORKSPACE}/spec/databases/cassandra/schema:/docker-entrypoint-initdb.d  cassandra:${{ matrix.cassandra-version }}
+
     - name: Create SQLServer Container
       run: docker run --rm -d --name sqlserver -p 1433:1433 -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password12!" -e "MSSQL_COLLATION=${{ matrix.sqlserver-collation }}" -v ${GITHUB_WORKSPACE}/spec/databases/sqlserver/schema:/docker-entrypoint-initdb.d mcr.microsoft.com/mssql/server:2017-latest
 
@@ -82,4 +90,4 @@ jobs:
     - name: Initialize SQLServer Schema
       run: docker exec -i sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost,1433 -U sa -P Password12! -i /docker-entrypoint-initdb.d/schema.sql -d "sqlectron"
 
-    - run: DB_CLIENTS=mysql,mariadb,postgresql,sqlite,sqlserver,cassandra npm run test:coverage
+    - run: DB_CLIENTS=mysql,mariadb,postgresql,redshift,sqlite,sqlserver,cassandra npm run test:coverage
