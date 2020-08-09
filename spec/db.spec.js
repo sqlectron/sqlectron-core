@@ -109,6 +109,7 @@ describe('db', () => {
             expect(dbConn.getVersion()).to.be.a('object');
             const expectedName = {
               postgresql: 'PostgreSQL',
+              redshift: 'PostgreSQL', // redshift does not identify itself uniquely from postgres 8
               mysql: 'MySQL',
               mariadb: 'MariaDB',
               sqlite: 'SQLite',
@@ -595,9 +596,6 @@ describe('db', () => {
         describe('.getRoutineCreateScript', () => {
           it('should return CREATE PROCEDURE/FUNCTION script', async () => {
             const [createScript] = await dbConn.getRoutineCreateScript('users_count', 'Procedure');
-
-            console.log(createScript);
-
             if (mysqlClients.includes(dbClient)) {
               expect(createScript).to.contain('CREATE DEFINER=');
               expect(createScript).to.contain([
@@ -618,11 +616,9 @@ describe('db', () => {
             } else if (dbClient === 'redshift') {
               expect(createScript).to.eql([
                 'CREATE OR REPLACE FUNCTION public.users_count()',
-                ' RETURNS bigint',
-                ' LANGUAGE sql',
-                'AS $function$',
+                '  RETURNS bigint AS $$',
                 '  SELECT COUNT(*) FROM users AS total;',
-                '$function$\n',
+                '$$ LANGUAGE sql VOLATILE',
               ].join('\n'));
             } else if (dbClient === 'sqlserver') {
               expect(createScript).to.contain('CREATE PROCEDURE dbo.users_count');

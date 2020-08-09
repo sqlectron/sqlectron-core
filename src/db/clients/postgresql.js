@@ -364,7 +364,6 @@ export async function getTableCreateScript(conn, table, schema) {
       array_to_string(
         array_agg(
           '  ' || quote_ident(tabdef.column_name) || ' ' ||  tabdef.type || ' '|| tabdef.not_null
-          ORDER BY tabdef.column_order ASC
         )
         , E',\n'
       ) || E'\n);\n' ||
@@ -394,7 +393,7 @@ export async function getTableCreateScript(conn, table, schema) {
       AND a.atttypid = t.oid
       AND n.oid = c.relnamespace
       AND n.nspname = $2
-      ORDER BY a.attnum DESC
+      ORDER BY a.attnum ASC
     ) AS tabdef
     LEFT JOIN information_schema.table_constraints tc
     ON  tc.table_name       = tabdef.table_name
@@ -446,13 +445,51 @@ export async function getRoutineCreateScript(conn, routine, _, schema) {
     `;
     mapFunction = (row) => row.pg_get_functiondef;
   } else {
+    // -- pg_catalog.array_to_string(p.proacl, '\n') AS "Access privileges",
     sql = `
-    SELECT prosrc
-    FROM pg_proc p
-    LEFT JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
-    WHERE p.proname = $1
-    AND n.nspname = $2
-  `;
+      SELECT
+        p.proname,
+        n.nspname,
+        CASE
+          WHEN p.proretset THEN 'SETOF '
+          ELSE ''
+        END || pg_catalog.format_type(p.prorettype, NULL) as prorettype,
+        p.proargnames,
+        pg_catalog.oidvectortypes(p.proargtypes) as "proargtypes",
+        CASE
+          WHEN p.proisagg THEN 'agg'
+          WHEN p.prorettype = 'pg_catalog.trigger'::pg_catalog.regtype THEN 'trigger'
+          ELSE 'func'
+        END AS protype,
+        CASE
+          WHEN p.provolatile = 'i' THEN 'IMMUTABLE'
+          WHEN p.provolatile = 's' THEN 'STABLE'
+          WHEN p.provolatile = 'v' THEN 'VOLATILE'
+        END as provolatility,
+        pg_catalog.pg_get_userbyid(p.proowner) as prowner_name,
+        CASE WHEN prosecdef THEN 'definer' ELSE 'invoker' END AS prosecurity,
+        l.lanname,
+        p.prosrc,
+        pg_catalog.obj_description(p.oid, 'pg_proc') as "description"
+      FROM pg_catalog.pg_proc p
+          LEFT JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
+          LEFT JOIN pg_catalog.pg_language l ON l.oid = p.prolang
+      WHERE p.proname = $1
+        AND n.nspname = $2
+        AND pg_catalog.pg_function_is_visible(p.oid);
+    `;
+    mapFunction = (row) => {
+      // TODO: expand support for other types as necessary
+      if (row.protype !== 'func') {
+        return row.prosrc;
+      }
+
+      let args = '';
+      if (row.proargtypes && row.proargtypes.length > 0) {
+        args = (row.proargtypes || '').split(', ').map((val, idx) => `${row.proargnames[idx]} ${val}`).join(', ');
+      }
+      return `CREATE OR REPLACE FUNCTION ${row.nspname}.${row.proname}(${args})\n  RETURNS ${row.prorettype} AS $$${row.prosrc}$$ LANGUAGE ${row.lanname} ${row.provolatility}`;
+    };
   }
 
   const params = [
