@@ -350,7 +350,7 @@ describe('db', () => {
               '  KEY `role_id` (`role_id`),\n' +
               '  CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE\n' +
               ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci');
-            } else if (dbClient === 'mysql' || dbClient === 'mariadb') {
+            } else if (mysqlClients.includes(dbClient)) {
               expect(createScript).to.contain('CREATE TABLE `users` (\n' +
                 '  `id` int(11) NOT NULL AUTO_INCREMENT,\n' +
                 '  `username` varchar(45) DEFAULT NULL,\n' +
@@ -367,7 +367,7 @@ describe('db', () => {
                 '  id integer NOT NULL,\n' +
                 '  username text NOT NULL,\n' +
                 '  email text NOT NULL,\n' +
-                '  password text NOT NULL,\n' +
+                '  "password" text NOT NULL,\n' +
                 '  role_id integer NULL,\n' +
                 '  createdat date NULL\n' +
                 ');\n' +
@@ -639,21 +639,34 @@ describe('db', () => {
             it('should be able to cancel the current query', (done) => {
               const sleepCommands = {
                 postgresql: 'SELECT pg_sleep(10);',
+                redshift: '',
                 mysql: 'SELECT SLEEP(10000);',
                 mariadb: 'SELECT SLEEP(10000);',
                 sqlserver: 'WAITFOR DELAY \'00:00:10\'; SELECT 1 AS number',
                 sqlite: '',
               };
 
-              // Since sqlite does not has a query command to sleep
-              // we have to do this by selecting a huge data source.
-              // This trick maske select from the same table multiple times.
+              // SQLite and Redshift both do not have a way to run a sleep query.
+              // Instead, we have to generate a query that will select a huge
+              // data source, and take longer than 5 seconds to run. For SQLite,
+              // that means doing a large select on the same table multiple times.
+              // For redshift, we just run a ton of queries.
               if (dbClient === 'sqlite') {
                 const fromTables = [];
-                for (let i = 0; i < 50; i++) { // eslint-disable-line no-plusplus
+                for (let i = 0; i < 50; i++) {
                   fromTables.push('sqlite_master');
                 }
                 sleepCommands.sqlite = `SELECT last.name FROM ${fromTables.join(',')} as last`;
+              } else if (dbClient === 'redshift') {
+                const queries = [];
+                for (let i = 0; i < 50000; i++) {
+                  queries.push(`
+                    SELECT col.*, tab.*
+                    FROM information_schema.columns AS col
+                    INNER JOIN information_schema.tables AS tab ON col.table_schema = tab.table_schema AND col.table_name = tab.table_name
+                  `);
+                }
+                sleepCommands.redshift = queries.join(';');
               }
 
               const query = dbConn.query(sleepCommands[dbClient]);
