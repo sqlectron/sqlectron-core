@@ -367,7 +367,7 @@ describe('db', () => {
                 '  id integer NOT NULL,\n' +
                 '  username text NOT NULL,\n' +
                 '  email text NOT NULL,\n' +
-                '  "password" text NOT NULL,\n' +
+                `  ${dbClient === 'postgresql' ? 'password' : '"password"'} text NOT NULL,\n` +
                 '  role_id integer NULL,\n' +
                 '  createdat date NULL\n' +
                 ');\n' +
