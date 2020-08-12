@@ -31,6 +31,16 @@ services:
     volumes:
       - ./spec/databases/postgresql/schema:/docker-entrypoint-initdb.d
 
+  redshift:
+    image: foundryai/postgres8:redshift
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DATABASE: sqlectron
+    volumes:
+      - ./spec/databases/redshift/schema:/docker-entrypoint-initdb.d
+
   cassandra:
     image: cassandra:3.7
     environment:

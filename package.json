@@ -15,6 +15,7 @@
     "test:sqlite": "DB_CLIENTS=sqlite npm run test",
     "test:sqlserver": "DB_CLIENTS=sqlserver npm run test",
     "test:postgresql": "DB_CLIENTS=postgresql npm run test",
+    "test:redshift": "DB_CLIENTS=redshift npm run test",
     "test:cassandra": "DB_CLIENTS=cassandra npm run test",
     "test": "npm run lint && mocha --exit --timeout 40000 --require @babel/register --reporter spec \"./spec/**/*.spec.js\"",
     "test:coverage": "nyc --reporter=text mocha --exit --timeout 4000 --require @babel/register --reporter spec \"./spec/**/*.spec.js\"",

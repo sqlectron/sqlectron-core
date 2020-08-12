@@ -3,7 +3,7 @@ import { identify } from 'sql-query-identifier';
 
 import { buildDatabseFilter, buildSchemaFilter } from './utils';
 import createLogger from '../../logger';
-import { createCancelablePromise } from '../../utils';
+import { createCancelablePromise, versionCompare } from '../../utils';
 import errors from '../../errors';
 
 const logger = createLogger('db:clients:postgresql');
@@ -282,7 +282,6 @@ export function query(conn, queryText) {
           ]);
 
           pid = null;
-
           return data;
         } catch (err) {
           if (canceling && err.code === pgErrors.CANCELED) {
@@ -358,67 +357,75 @@ export function getQuerySelectTop(conn, table, limit, schema) {
 
 export async function getTableCreateScript(conn, table, schema) {
   // Reference http://stackoverflow.com/a/32885178
-  const sql = `
-    SELECT
-      'CREATE TABLE ' || quote_ident(tabdef.schema_name) || '.' || quote_ident(tabdef.table_name) || E' (\n' ||
-      array_to_string(
-        array_agg(
-          '  ' || quote_ident(tabdef.column_name) || ' ' ||  tabdef.type || ' '|| tabdef.not_null
-          ORDER BY tabdef.column_order ASC
-        )
-        , E',\n'
-      ) || E'\n);\n' ||
-      CASE WHEN tc.constraint_name IS NULL THEN ''
-           ELSE E'\nALTER TABLE ' || quote_ident($2) || '.' || quote_ident(tabdef.table_name) ||
-           ' ADD CONSTRAINT ' || quote_ident(tc.constraint_name)  ||
-           ' PRIMARY KEY ' || '(' || substring(constr.column_name from 0 for char_length(constr.column_name)-1) || ')'
-      END AS createtable
-    FROM
-    ( SELECT
-        c.relname AS table_name,
-        a.attname AS column_name,
-        pg_catalog.format_type(a.atttypid, a.atttypmod) AS type,
-        CASE
-          WHEN a.attnotnull THEN 'NOT NULL'
-        ELSE 'NULL'
-        END AS not_null,
-        n.nspname as schema_name,
-        a.attnum as column_order
-      FROM pg_class c,
-       pg_attribute a,
-       pg_type t,
-       pg_namespace n
-      WHERE c.relname = $1
-      AND a.attnum > 0
-      AND a.attrelid = c.oid
-      AND a.atttypid = t.oid
-      AND n.oid = c.relnamespace
-      AND n.nspname = $2
-      ORDER BY a.attnum DESC
-    ) AS tabdef
-    LEFT JOIN information_schema.table_constraints tc
-    ON  tc.table_name       = tabdef.table_name
-    AND tc.table_schema     = tabdef.schema_name
-    AND tc.constraint_Type  = 'PRIMARY KEY'
-    LEFT JOIN LATERAL (
-      SELECT column_name || ', ' AS column_name
-      FROM   information_schema.key_column_usage kcu
-      WHERE  kcu.constraint_name = tc.constraint_name
-      AND kcu.table_name = tabdef.table_name
-      AND kcu.table_schema = tabdef.schema_name
-      ORDER BY ordinal_position
-    ) AS constr ON true
-    GROUP BY tabdef.schema_name, tabdef.table_name, tc.constraint_name, constr.column_name;
-  `;
 
   const params = [
     table,
     schema,
   ];
 
-  const data = await driverExecuteQuery(conn, { query: sql, params });
+  const tableSql = `
+    SELECT
+      'CREATE TABLE ' || quote_ident(n.nspname) || '.' || quote_ident(c.relname) || ' (' AS create_table
+    FROM pg_class c,
+    pg_namespace n
+    WHERE c.relname = $1
+    AND n.nspname = $2
+  `;
+  let createTable = (await driverExecuteQuery(conn, { query: tableSql, params })).rows[0].create_table;
 
-  return data.rows.map((row) => row.createtable);
+  const columnSql = `
+    SELECT
+      quote_ident(a.attname) AS column_name,
+      pg_catalog.format_type(a.atttypid, a.atttypmod) AS type,
+      CASE
+        WHEN a.attnotnull THEN 'NOT NULL'
+      ELSE 'NULL'
+      END AS not_null,
+      a.attnum as column_order
+    FROM pg_class c,
+    pg_attribute a,
+    pg_type t,
+    pg_namespace n
+    WHERE c.relname = $1
+    AND a.attnum > 0
+    AND a.attrelid = c.oid
+    AND a.atttypid = t.oid
+    AND n.oid = c.relnamespace
+    AND n.nspname = $2
+    ORDER BY a.attnum ASC
+  `;
+  const columnData = await driverExecuteQuery(conn, { query: columnSql, params });
+
+  const columns = [];
+  columnData.rows.forEach((row) => {
+    columns.push(`  ${row.column_name} ${row.type} ${row.not_null}`);
+  });
+
+  createTable += `\n${columns.join(',\n')}\n);\n`;
+
+  const constraintSql = `
+    SELECT
+      CASE WHEN tc.constraint_name IS NULL THEN ''
+              ELSE 'ALTER TABLE ' || quote_ident($2) || '.' || quote_ident($1) ||
+              ' ADD CONSTRAINT ' || quote_ident(tc.constraint_name)  ||
+              ' PRIMARY KEY ' || '(' || constr.column_name || ')'
+          END AS constraint
+    FROM information_schema.table_constraints tc
+    LEFT JOIN information_schema.key_column_usage as constr
+    ON constr.constraint_name = tc.constraint_name
+    AND constr.table_name = tc.table_name
+    AND constr.table_schema = tc.table_schema
+    WHERE
+      tc.constraint_type  = 'PRIMARY KEY'
+      AND tc.table_name   = $1
+      AND tc.table_schema = $2;
+  `;
+
+  const constraintResult = (await driverExecuteQuery(conn, { query: constraintSql, params })).rows[0];
+  if (constraintResult.constraint.length > 0) {
+    createTable += `\n${constraintResult.constraint}`;
+  }
+  return [createTable];
 }
 
 export async function getViewCreateScript(conn, view, schema) {
@@ -434,13 +441,64 @@ export async function getViewCreateScript(conn, view, schema) {
 }
 
 export async function getRoutineCreateScript(conn, routine, _, schema) {
-  const sql = `
-    SELECT pg_get_functiondef(p.oid)
-    FROM pg_proc p
-    LEFT JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
-    WHERE proname = $1
-    AND n.nspname = $2
-  `;
+  let mapFunction;
+  let sql;
+  if (versionCompare(conn.versionData.version, '8.4') >= 0) {
+    sql = `
+      SELECT pg_get_functiondef(p.oid)
+      FROM pg_proc p
+      LEFT JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
+      WHERE proname = $1
+      AND n.nspname = $2
+    `;
+    mapFunction = (row) => row.pg_get_functiondef;
+  } else {
+    // -- pg_catalog.array_to_string(p.proacl, '\n') AS "Access privileges",
+    sql = `
+      SELECT
+        p.proname,
+        n.nspname,
+        CASE
+          WHEN p.proretset THEN 'SETOF '
+          ELSE ''
+        END || pg_catalog.format_type(p.prorettype, NULL) as prorettype,
+        p.proargnames,
+        pg_catalog.oidvectortypes(p.proargtypes) as "proargtypes",
+        CASE
+          WHEN p.proisagg THEN 'agg'
+          WHEN p.prorettype = 'pg_catalog.trigger'::pg_catalog.regtype THEN 'trigger'
+          ELSE 'func'
+        END AS protype,
+        CASE
+          WHEN p.provolatile = 'i' THEN 'IMMUTABLE'
+          WHEN p.provolatile = 's' THEN 'STABLE'
+          WHEN p.provolatile = 'v' THEN 'VOLATILE'
+        END as provolatility,
+        pg_catalog.pg_get_userbyid(p.proowner) as prowner_name,
+        CASE WHEN prosecdef THEN 'definer' ELSE 'invoker' END AS prosecurity,
+        l.lanname,
+        p.prosrc,
+        pg_catalog.obj_description(p.oid, 'pg_proc') as "description"
+      FROM pg_catalog.pg_proc p
+          LEFT JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
+          LEFT JOIN pg_catalog.pg_language l ON l.oid = p.prolang
+      WHERE p.proname = $1
+        AND n.nspname = $2
+        AND pg_catalog.pg_function_is_visible(p.oid);
+    `;
+    mapFunction = (row) => {
+      // TODO: expand support for other types as necessary
+      if (row.protype !== 'func') {
+        return row.prosrc;
+      }
+
+      let args = '';
+      if (row.proargtypes && row.proargtypes.length > 0) {
+        args = (row.proargtypes || '').split(', ').map((val, idx) => `${row.proargnames[idx]} ${val}`).join(', ');
+      }
+      return `CREATE OR REPLACE FUNCTION ${row.nspname}.${row.proname}(${args})\n  RETURNS ${row.prorettype} AS $$${row.prosrc}$$ LANGUAGE ${row.lanname} ${row.provolatility}`;
+    };
+  }
 
   const params = [
     routine,
@@ -449,7 +507,7 @@ export async function getRoutineCreateScript(conn, routine, _, schema) {
 
   const data = await driverExecuteQuery(conn, { query: sql, params });
 
-  return data.rows.map((row) => row.pg_get_functiondef);
+  return data.rows.map(mapFunction);
 }
 
 export function wrapIdentifier(value) {
@@ -485,12 +543,62 @@ export async function truncateAllTables(conn, schema) {
 
     const data = await driverExecuteQuery(connClient, { query: sql, params });
 
-    const truncateAll = data.rows.map((row) => `
-      TRUNCATE TABLE ${wrapIdentifier(schema)}.${wrapIdentifier(row.table_name)}
-      RESTART IDENTITY CASCADE;
-    `).join('');
+    if (versionCompare(conn.versionData.version, '8.4') >= 0) {
+      const truncateAll = data.rows.map((row) => `
+        TRUNCATE TABLE ${wrapIdentifier(schema)}.${wrapIdentifier(row.table_name)}
+        RESTART IDENTITY CASCADE;
+      `).join('');
 
-    await driverExecuteQuery(connClient, { query: truncateAll, multiple: true });
+      await driverExecuteQuery(connClient, { query: truncateAll, multiple: true });
+    } else {
+      // RESTART IDENTITY CASCADE was added in Postgres 8.4. The cascade handled
+      // under the hood the foreign key constraints so without it, we first have
+      // to remove all of them, run the truncate, reset the sequences, and then
+      // readd the constraints.
+      const seqData = await driverExecuteQuery(connClient, {
+        query: "SELECT relname FROM pg_class WHERE relkind = 'S'",
+      });
+      const disableTriggers = await driverExecuteQuery(connClient, {
+        query: `
+          SELECT 'ALTER TABLE '||quote_ident(nspname)||'.'||quote_ident(relname)||' DROP CONSTRAINT '||quote_ident(conname)||';' AS query
+          FROM pg_constraint
+          INNER JOIN pg_class ON conrelid=pg_class.oid
+          INNER JOIN pg_namespace ON pg_namespace.oid=pg_class.relnamespace
+          WHERE contype='f'
+          ORDER BY nspname, relname, conname;
+        `,
+      });
+      const enableTriggers = await driverExecuteQuery(connClient, {
+        query: `
+          SELECT 'ALTER TABLE "'||nspname||'"."'||relname||'" ADD CONSTRAINT "'||conname||'" '|| pg_get_constraintdef(pg_constraint.oid)||';' AS query
+          FROM pg_constraint
+          INNER JOIN pg_class ON conrelid=pg_class.oid
+          INNER JOIN pg_namespace ON pg_namespace.oid=pg_class.relnamespace
+          WHERE contype='f'
+          ORDER BY nspname DESC,relname DESC,conname DESC;
+        `,
+      });
+
+      await driverExecuteQuery(connClient, { query: 'BEGIN' });
+
+      let truncateAll = '';
+      truncateAll += disableTriggers.rows.map((row) => `${row.query}`).join('\n');
+      truncateAll += data.rows.map((row) => `
+        TRUNCATE TABLE ${wrapIdentifier(schema)}.${wrapIdentifier(row.table_name)};
+      `).join('');
+      truncateAll += seqData.rows.map((row) => `
+        ALTER SEQUENCE ${row.relname} START 1;
+      `).join('');
+      truncateAll += enableTriggers.rows.map((row) => `${row.query}`).join('\n');
+
+      try {
+        await driverExecuteQuery(connClient, { query: truncateAll, multiple: true });
+        await driverExecuteQuery(connClient, { query: 'COMMIT' });
+      } catch (e) {
+        await driverExecuteQuery(connClient, { query: 'ROLLBACK' });
+        throw e;
+      }
+    }
   });
 }
 

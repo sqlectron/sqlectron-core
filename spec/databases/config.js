@@ -12,7 +12,7 @@ const postgres = new ConnectionString(process.env.POSTGRES_DSN, {
   user: 'postgres',
   password: 'Password12!',
   path: ['sqlectron'],
-  hosts: [{ name: 'localhost', port: 5432 }],
+  hosts: [{ name: '127.0.0.1', port: 5432 }],
 });
 dbs.postgresql = {
   host: postgres.hostname,
@@ -20,6 +20,21 @@ dbs.postgresql = {
   user: postgres.user,
   password: postgres.password,
   database: postgres.path && postgres.path[0],
+};
+
+const redshift = new ConnectionString(process.env.REDSHIFT_DSN, {
+  protocol: 'postgres',
+  user: 'postgres',
+  password: 'Password12!',
+  path: ['sqlectron'],
+  hosts: [{ name: '127.0.0.1', port: 5433 }],
+});
+dbs.redshift = {
+  host: redshift.hostname,
+  port: redshift.port || 5433,
+  user: redshift.user,
+  password: redshift.password,
+  database: redshift.path && redshift.path[0],
 };
 
 const mysql = new ConnectionString(process.env.MYSQL_DSN, {
