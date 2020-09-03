@@ -18,7 +18,6 @@ export default async function (server, database) {
   const conn = { dbConfig };
 
   // light solution to test connection with with the server
-  console.log(await driverExecuteQuery(conn, { query: 'SELECT @@version as \'version\'' }));
   const version = (await driverExecuteQuery(conn, { query: 'SELECT @@version as \'version\'' })).data[0].version;
 
   conn.versionData = {
@@ -479,9 +478,12 @@ export async function driverExecuteQuery(conn, queryArgs) {
       request.multiple = true;
     }
 
+    const queryResult = await request.query(queryArgs.query);
+
     return {
       request,
-      data: await request.query(queryArgs.query),
+      data: queryResult.recordsets,
+      result: queryResult,
     };
   };
 
