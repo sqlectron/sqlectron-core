@@ -1,4 +1,4 @@
-import { Connection } from 'mssql';
+import { ConnectionPool } from 'mssql';
 import { identify } from 'sql-query-identifier';
 
 import { buildDatabseFilter, buildSchemaFilter } from './utils';
@@ -53,7 +53,7 @@ export default async function (server, database) {
 
 
 export async function disconnect(conn) {
-  const connection = await new Connection(conn.dbConfig);
+  const connection = await ConnectionPool(conn.dbConfig);
   connection.close();
 }
 
@@ -490,7 +490,7 @@ export async function driverExecuteQuery(conn, queryArgs) {
 }
 
 async function runWithConnection(conn, run) {
-  const connection = await new Connection(conn.dbConfig).connect();
+  const connection = await ConnectionPool(conn.dbConfig);
 
   return run(connection);
 }
