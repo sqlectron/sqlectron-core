@@ -1,4 +1,4 @@
-import { ConnectionPool } from 'mssql';
+import { connect } from 'mssql';
 import { identify } from 'sql-query-identifier';
 
 import { buildDatabseFilter, buildSchemaFilter } from './utils';
@@ -18,6 +18,7 @@ export default async function (server, database) {
   const conn = { dbConfig };
 
   // light solution to test connection with with the server
+  console.log(await driverExecuteQuery(conn, { query: 'SELECT @@version as \'version\'' }));
   const version = (await driverExecuteQuery(conn, { query: 'SELECT @@version as \'version\'' })).data[0].version;
 
   conn.versionData = {
@@ -53,7 +54,7 @@ export default async function (server, database) {
 
 
 export async function disconnect(conn) {
-  const connection = await ConnectionPool(conn.dbConfig);
+  const connection = await connect(conn.dbConfig);
   connection.close();
 }
 
@@ -490,7 +491,7 @@ export async function driverExecuteQuery(conn, queryArgs) {
 }
 
 async function runWithConnection(conn, run) {
-  const connection = await ConnectionPool(conn.dbConfig);
+  const connection = await connect(conn.dbConfig);
 
   return run(connection);
 }
