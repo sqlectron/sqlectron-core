@@ -498,12 +498,12 @@ export async function driverExecuteQuery(conn, queryArgs) {
       request.multiple = true;
     }
 
-    const queryResult = await request.query(queryArgs.query);
+    const result = await request.query(queryArgs.query);
 
     return {
       request,
-      data: request.multiple ? queryResult.recordsets : queryResult.recordset,
-      result: queryResult,
+      data: request.multiple ? result.recordsets : result.recordset,
+      result,
     };
   };
 
