@@ -1,4 +1,4 @@
-import { Connection } from 'mssql';
+import { connect } from 'mssql';
 import { identify } from 'sql-query-identifier';
 
 import { buildDatabseFilter, buildSchemaFilter } from './utils';
@@ -15,10 +15,17 @@ export default async function (server, database) {
   const dbConfig = configDatabase(server, database);
   logger().debug('create driver client for mmsql with config %j', dbConfig);
 
+  if (!dbConfig.options) {
+    dbConfig.options = {};
+  }
+  if (dbConfig.options.enableArithAbort === undefined) {
+    dbConfig.options.enableArithAbort = false;
+  }
+
   const conn = { dbConfig };
 
   // light solution to test connection with with the server
-  const version = (await driverExecuteQuery(conn, { query: 'SELECT @@version as \'version\'' })).data[0].version;
+  const version = (await driverExecuteQuery(conn, { query: "SELECT @@version as 'version'" })).data[0].version;
 
   conn.versionData = {
     name: 'SQL Server',
@@ -53,7 +60,7 @@ export default async function (server, database) {
 
 
 export async function disconnect(conn) {
-  const connection = await new Connection(conn.dbConfig);
+  const connection = await connect(conn.dbConfig);
   connection.close();
 }
 
@@ -81,15 +88,21 @@ export function query(conn, queryText) {
 
           queryRequest = request;
 
-          const data = await promiseQuery;
+          const result = await promiseQuery;
+          const data = request.multiple ? result.datasets : result.dataset;
+          const affectedRows = result.affectedRows.reduce((a, b) => a + b, 0);
 
           const commands = identifyCommands(queryText).map((item) => item.type);
 
           // Executing only non select queries will not return results.
           // So we "fake" there is at least one result.
-          const results = !data.length && request.rowsAffected ? [[]] : data;
+          const results = !data.length && affectedRows ? [[]] : data;
 
-          return results.map((_, idx) => parseRowQueryResult(results[idx], request, commands[idx]));
+          return results.map((_, idx) => parseRowQueryResult(
+            results[idx],
+            affectedRows,
+            commands[idx],
+          ));
         } catch (err) {
           if (err.code === mmsqlErrors.CANCELED) {
             err.sqlectronError = 'CANCELED_BY_USER';
@@ -112,15 +125,22 @@ export function query(conn, queryText) {
 
 
 export async function executeQuery(conn, queryText) {
-  const { request, data } = await driverExecuteQuery(conn, { query: queryText, multiple: true });
+  const { data, result } = await driverExecuteQuery(
+    conn,
+    {
+      query: queryText,
+      multiple: true,
+    },
+  );
 
   const commands = identifyCommands(queryText).map((item) => item.type);
 
   // Executing only non select queries will not return results.
   // So we "fake" there is at least one result.
-  const results = !data.length && request.rowsAffected ? [[]] : data;
+  const rowsAffected = result.rowsAffected.reduce((a, b) => a + b, 0);
+  const results = !data.length && rowsAffected ? [[]] : data;
 
-  return results.map((_, idx) => parseRowQueryResult(results[idx], request, commands[idx]));
+  return results.map((_, idx) => parseRowQueryResult(results[idx], rowsAffected, commands[idx]));
 }
 
 
@@ -449,16 +469,16 @@ function configDatabase(server, database) {
 }
 
 
-function parseRowQueryResult(data, request, command) {
+function parseRowQueryResult(data, rowsAffected, command) {
   // Fallback in case the identifier could not reconize the command
-  const isSelect = !!(data.length || !request.rowsAffected);
+  const isSelect = !!(data.length || !rowsAffected);
 
   return {
     command: command || (isSelect && 'SELECT'),
     rows: data,
     fields: Object.keys(data[0] || {}).map((name) => ({ name })),
     rowCount: data.length,
-    affectedRows: request.rowsAffected,
+    affectedRows: rowsAffected,
   };
 }
 
@@ -478,9 +498,12 @@ export async function driverExecuteQuery(conn, queryArgs) {
       request.multiple = true;
     }
 
+    const result = await request.query(queryArgs.query);
+
     return {
       request,
-      data: await request.query(queryArgs.query),
+      data: request.multiple ? result.recordsets : result.recordset,
+      result,
     };
   };
 
@@ -490,7 +513,7 @@ export async function driverExecuteQuery(conn, queryArgs) {
 }
 
 async function runWithConnection(conn, run) {
-  const connection = await new Connection(conn.dbConfig).connect();
+  const connection = await connect(conn.dbConfig);
 
   return run(connection);
 }
