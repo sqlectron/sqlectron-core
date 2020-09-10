@@ -199,7 +199,7 @@ function listDatabases(server, database, filter) {
 async function getQuerySelectTop(server, database, table, schema, limit) {
   checkIsConnected(server, database);
   let limitValue = limit;
-  if (typeof _limit === 'undefined') {
+  if (typeof limit === 'undefined') {
     await loadConfigLimit();
     limitValue = typeof limitSelect !== 'undefined' ? limitSelect : DEFAULT_LIMIT;
   }
