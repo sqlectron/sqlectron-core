@@ -47,7 +47,7 @@ export function createConnection(server, database) {
 
 async function connect(server, database) {
   /* eslint no-param-reassign: 0 */
-  if (database.connecting) {
+  if (server.connecting) {
     throw new Error('There is already a connection in progress for this server. Aborting this new request.');
   }
 
