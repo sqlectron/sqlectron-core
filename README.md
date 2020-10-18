@@ -38,6 +38,8 @@ SQLECTRON keeps a configuration file in the directory
 * **Linux** (`$XDG_CONFIG_HOME` or `~/.config`) + `/Sqlectron`
 * **Windows** (`$LOCALAPPDATA` or `%USERPROFILE%\AppData\Local`) + `\Sqlectron\Config`
 
+> You can overwrite the directory used by setting the `SQLECTRON_CONFIG` environment variable to the desired directory.
+
 > For older versions it was stored as `.sqlectron.json` at the user's home directory (`~/` osx and linux; `%userprofile%` windows ).
 
 Although you can change this file manually, most of time you should not worry about it because SQLECTRON will manage the configuration for you.
