@@ -15,7 +15,9 @@ export function getConfigPath() {
   const configName = 'sqlectron.json';
   const oldConfigPath = path.join(homedir(), `.${configName}`);
 
-  if (fileExistsSync(oldConfigPath)) {
+  if (process.env.SQLECTRON_HOME) {
+    configPath = path.join(process.env.SQLECTRON_HOME, configName);
+  } else if (fileExistsSync(oldConfigPath)) {
     configPath = oldConfigPath;
   } else {
     const newConfigDir = envPaths('Sqlectron', { suffix: '' }).config;

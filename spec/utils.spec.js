@@ -1,5 +1,6 @@
 import { expect } from 'chai';
-import { versionCompare } from '../src/utils';
+import { join } from 'path';
+import { getConfigPath, versionCompare } from '../src/utils';
 
 describe('utils', () => {
   describe('.versionCompare', () => {
@@ -19,6 +20,25 @@ describe('utils', () => {
     ].forEach(([versionA, versionB, expected]) => {
       it(`.versionCompare('${versionA}', '${versionB}') === ${expected}`, () => {
         expect(versionCompare(versionA, versionB)).to.be.eql(expected);
+      });
+    });
+  });
+
+  describe('.getConfigPath', () => {
+    describe('use of SQLECTRON_HOME', () => {
+      let env;
+
+      before(() => {
+        env = process.env;
+        process.env = { SQLECTRON_HOME: '/path/to/env' };
+      });
+
+      it('should get config from process.env.SQLECTRON_HOME', () => {
+        expect(getConfigPath()).to.be.eql(join(process.env.SQLECTRON_HOME, 'sqlectron.json'));
+      });
+
+      after(() => {
+        process.env = env;
       });
     });
   });
