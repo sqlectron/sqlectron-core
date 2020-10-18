@@ -1,9 +1,10 @@
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { db } from '../src';
+import { stub } from 'sinon';
 import config from './databases/config';
 import setupSQLite from './databases/sqlite/setup';
 import setupCassandra from './databases/cassandra/setup';
+import { db, config as srcConfig } from '../src';
 import { versionCompare } from '../src/utils';
 
 chai.use(chaiAsPromised);
@@ -696,11 +697,35 @@ describe('db', () => {
           });
         }
 
+
         describe('.getQuerySelectTop', () => {
-          it('should return select with default limit', async (done) => {
+          let stubObj;
+
+          beforeEach(() => {
+            stubObj = stub(srcConfig, 'get');
+          });
+
+          afterEach(() => {
+            stubObj.restore();
+          });
+
+          it('should return select with default limit', async () => {
+            stubObj.returns({});
             const sql = await dbConn.getQuerySelectTop('test_table');
-            expect(sql).to.eql('test');
-            done();
+            expect(sql).to.eql('SELECT * FROM `test_table` LIMIT 1000');
+          });
+
+          it('should return select with limit from config', async () => {
+            stubObj.returns({
+              limitQueryDefaultSelectTop: 125,
+            });
+            const sql = await dbConn.getQuerySelectTop('test_table');
+            expect(sql).to.eql('SELECT * FROM `test_table` LIMIT 125');
+          });
+
+          it('should return select with limit from parameters', async () => {
+            const sql = await dbConn.getQuerySelectTop('test_table', 'public', 222);
+            expect(sql).to.eql('SELECT * FROM `test_table` LIMIT 222');
           });
         });
 
