@@ -13,7 +13,9 @@ It is pronounced "sequelectron" - https://translate.google.com/?source=osdd#en/e
 
 #### Current supported databases
 * [PostgreSQL](http://www.postgresql.org/)
+* [Redshift](https://aws.amazon.com/redshift/)
 * [MySQL](https://www.mysql.com/)
+* [MariaDB](https://mariadb.org/)
 * [Microsoft SQL Server](http://www.microsoft.com/en-us/server-cloud/products/sql-server/)
 * [Cassandra](http://cassandra.apache.org/) (NoSQL; [Exceptions about this client](https://github.com/sqlectron/sqlectron-core/releases/tag/v6.3.0))
 * [SQLite](https://sqlite.org/)
