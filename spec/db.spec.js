@@ -7,6 +7,7 @@ import setupCassandra from './databases/cassandra/setup';
 import { db, config as srcConfig } from '../src';
 import { clearLimitSelect } from '../src/db/client';
 import { versionCompare } from '../src/utils';
+import mysql from '../src/db/clients/mysql';
 
 chai.use(chaiAsPromised);
 
@@ -649,7 +650,18 @@ describe('db', () => {
           it('should return select with default limit', async () => {
             stubObj.returns({});
             const sql = await dbConn.getQuerySelectTop('test_table');
-            expect(sql).to.eql('SELECT * FROM `test_table` LIMIT 1000');
+            if (mysqlClients.includes(dbClient)) {
+              expect(sql).to.eql('SELECT * FROM `test_table` LIMIT 1000');
+            } else if (postgresClients.includes(dbClient)) {
+              expect(sql).to.eql('SELECT * FROM "public"."test_table" LIMIT 1000');
+            } else if (dbClient === 'sqlite' || dbClient === 'cassandra') {
+              expect(sql).to.eql('SELECT * FROM "test_table" LIMIT 1000');
+            } else if (dbClient === 'sqlserver') {
+              expect(sql).to.eql('SELECT TOP 1000 * FROM [test_table]');
+            } else {
+              throw new Error('Invalid db client');
+            }
+
           });
 
           it('should return select with limit from config', async () => {
@@ -657,12 +669,32 @@ describe('db', () => {
               limitQueryDefaultSelectTop: 125,
             });
             const sql = await dbConn.getQuerySelectTop('test_table');
-            expect(sql).to.eql('SELECT * FROM `test_table` LIMIT 125');
+            if (mysqlClients.includes(dbClient)) {
+              expect(sql).to.eql('SELECT * FROM `test_table` LIMIT 125');
+            } else if (postgresClients.includes(dbClient)) {
+              expect(sql).to.eql('SELECT * FROM "public"."test_table" LIMIT 125');
+            } else if (dbClient === 'sqlite' || dbClient === 'cassandra') {
+              expect(sql).to.eql('SELECT * FROM "test_table" LIMIT 125');
+            } else if (dbClient === 'sqlserver') {
+              expect(sql).to.eql('SELECT TOP 125 * FROM [test_table]');
+            } else {
+              throw new Error('Invalid db client');
+            }
           });
 
           it('should return select with limit from parameters', async () => {
             const sql = await dbConn.getQuerySelectTop('test_table', 'public', 222);
-            expect(sql).to.eql('SELECT * FROM `test_table` LIMIT 222');
+            if (mysqlClients.includes(dbClient)) {
+              expect(sql).to.eql('SELECT * FROM `test_table` LIMIT 222');
+            } else if (dbClient === 'postgresql') {
+              expect(sql).to.eql('SELECT * FROM "public"."test_table" LIMIT 222');
+            } else if (dbClient === 'sqlite' || dbClient === 'cassandra') {
+              expect(sql).to.eql('SELECT * FROM "test_table" LIMIT 222');
+            } else if (dbClient === 'sqlserver') {
+              expect(sql).to.eql('SELECT TOP 222 * FROM [test_table]');
+            } else {
+              throw new Error('Invalid db client');
+            }
           });
         });
 
