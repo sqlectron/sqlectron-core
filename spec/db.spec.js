@@ -7,7 +7,6 @@ import setupCassandra from './databases/cassandra/setup';
 import { db, config as srcConfig } from '../src';
 import { clearLimitSelect } from '../src/db/client';
 import { versionCompare } from '../src/utils';
-import mysql from '../src/db/clients/mysql';
 
 chai.use(chaiAsPromised);
 
@@ -661,7 +660,6 @@ describe('db', () => {
             } else {
               throw new Error('Invalid db client');
             }
-
           });
 
           it('should return select with limit from config', async () => {
