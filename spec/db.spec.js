@@ -696,6 +696,14 @@ describe('db', () => {
           });
         }
 
+        describe('.getQuerySelectTop', () => {
+          it('should return select with default limit', async (done) => {
+            const sql = await dbConn.getQuerySelectTop('test_table');
+            expect(sql).to.eql('test');
+            done();
+          });
+        });
+
         describe('.executeQuery', () => {
           const includePk = dbClient === 'cassandra';
 
