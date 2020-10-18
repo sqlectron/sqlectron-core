@@ -684,7 +684,7 @@ describe('db', () => {
             const sql = await dbConn.getQuerySelectTop('test_table', 'public', 222);
             if (mysqlClients.includes(dbClient)) {
               expect(sql).to.eql('SELECT * FROM `test_table` LIMIT 222');
-            } else if (dbClient === 'postgresql') {
+            } else if (postgresClients.includes(dbClient)) {
               expect(sql).to.eql('SELECT * FROM "public"."test_table" LIMIT 222');
             } else if (dbClient === 'sqlite' || dbClient === 'cassandra') {
               expect(sql).to.eql('SELECT * FROM "test_table" LIMIT 222');
