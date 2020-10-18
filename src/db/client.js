@@ -45,6 +45,11 @@ export function createConnection(server, database) {
 }
 
 
+export function clearLimitSelect() {
+  limitSelect = null;
+}
+
+
 async function connect(server, database) {
   /* eslint no-param-reassign: 0 */
   if (database.connecting) {
@@ -197,7 +202,7 @@ async function getQuerySelectTop(server, database, table, schema, limit) {
   let limitValue = limit;
   if (typeof limit === 'undefined') {
     await loadConfigLimit();
-    limitValue = typeof limitSelect !== 'undefined' ? limitSelect : DEFAULT_LIMIT;
+    limitValue = (typeof limitSelect !== 'undefined' && limitSelect !== null) ? limitSelect : DEFAULT_LIMIT;
   }
   return database.connection.getQuerySelectTop(table, limitValue, schema);
 }
@@ -279,7 +284,7 @@ function wrap(database, identifier) {
 }
 
 async function loadConfigLimit() {
-  if (limitSelect === null) {
+  if (typeof limitSelect === 'undefined' || limitSelect === null) {
     const { limitQueryDefaultSelectTop } = await config.get();
     limitSelect = limitQueryDefaultSelectTop;
   }
