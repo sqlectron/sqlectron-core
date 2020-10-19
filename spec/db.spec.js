@@ -767,7 +767,7 @@ describe('db', () => {
             let expected;
             if (dbClient === 'sqlserver') {
               expected = 1;
-            } else if (dbClient === '') {
+            } else if (dbClient === 'sqlite') {
               expected = 0;
             }
             expect(result[0].affectedRows).to.eql(expected);
