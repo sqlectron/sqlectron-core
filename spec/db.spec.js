@@ -758,6 +758,13 @@ describe('db', () => {
               }, 5000);
             });
           });
+
+          it('select function return result', async () => {
+            const query = dbConn.query('SELECT CURRENT_TIMESTAMP');
+            const result = await query.execute();
+            console.log(result);
+            expect(result[0].affectedRows).to.eql(0);
+          });
         }
 
         describe('.executeQuery', () => {
