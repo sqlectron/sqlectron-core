@@ -89,9 +89,9 @@ export function query(conn, queryText) {
           queryRequest = request;
 
           const result = await promiseQuery;
-          const data = request.multiple ? result.datasets : result.dataset;
-          const affectedRows = result.affectedRows ?
-            result.affectedRows.reduce((a, b) => a + b, 0) :
+          const data = request.multiple ? result.recordsets : result.recordset;
+          const affectedRows = result.rowsAffected ?
+            result.rowsAffected.reduce((a, b) => a + b, 0) :
             undefined;
 
           const commands = identifyCommands(queryText).map((item) => item.type);
