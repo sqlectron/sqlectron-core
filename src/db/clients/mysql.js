@@ -510,11 +510,11 @@ export function filterDatabase(item, { database } = {}, databaseField) {
 
   const { only, ignore } = database;
 
-  if (only && only.length && !~only.indexOf(value)) {
+  if (only && only.length && !only.includes(value)) {
     return false;
   }
 
-  if (ignore && ignore.length && ~ignore.indexOf(value)) {
+  if (ignore && ignore.length && ignore.includes(value)) {
     return false;
   }
 

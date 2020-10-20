@@ -33,7 +33,7 @@ const mysqlClients = ['mysql', 'mariadb'];
 
 describe('db', () => {
   const dbClients = dbsToTest.length ? dbsToTest : SUPPORTED_DB_CLIENTS;
-  if (dbClients.some((dbClient) => !~SUPPORTED_DB_CLIENTS.indexOf(dbClient))) {
+  if (dbClients.some((dbClient) => !SUPPORTED_DB_CLIENTS.includes(dbClient))) {
     throw new Error('Invalid selected db client for tests');
   }
 
