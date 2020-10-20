@@ -758,6 +758,20 @@ describe('db', () => {
               }, 5000);
             });
           });
+
+          it('should query single result from function', async () => {
+            const query = dbConn.query('SELECT CURRENT_TIMESTAMP');
+            const result = await query.execute();
+            expect(result[0].rows[0]).to.be.not.null;
+            expect(result[0].rowCount).to.eql(1);
+            let expected;
+            if (dbClient === 'sqlserver') {
+              expected = 1;
+            } else if (dbClient === 'sqlite') {
+              expected = 0;
+            }
+            expect(result[0].affectedRows).to.eql(expected);
+          });
         }
 
         describe('.executeQuery', () => {
