@@ -351,7 +351,7 @@ describe('db', () => {
               '  PRIMARY KEY (`id`),\n' +
               '  KEY `role_id` (`role_id`),\n' +
               '  CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE\n' +
-              ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci');
+              ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\n');
             } else if (mysqlClients.includes(dbClient)) {
               expect(createScript).to.contain('CREATE TABLE `users` (\n' +
                 '  `id` int(11) NOT NULL AUTO_INCREMENT,\n' +
@@ -363,7 +363,7 @@ describe('db', () => {
                 '  PRIMARY KEY (`id`),\n' +
                 '  KEY `role_id` (`role_id`),\n' +
                 '  CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE\n' +
-              ') ENGINE=InnoDB');
+              ') ENGINE=InnoDB;\n');
             } else if (postgresClients.includes(dbClient)) {
               expect(createScript).to.eql('CREATE TABLE public.users (\n' +
                 '  id integer NOT NULL,\n' +
@@ -374,7 +374,7 @@ describe('db', () => {
                 '  createdat date NULL\n' +
                 ');\n' +
                 '\n' +
-                'ALTER TABLE public.users ADD CONSTRAINT users_pkey PRIMARY KEY (id)',
+                'ALTER TABLE public.users ADD CONSTRAINT users_pkey PRIMARY KEY (id);\n',
               );
             } else if (dbClient === 'sqlserver') {
               expect(createScript).to.contain('CREATE TABLE users (\r\n' +
@@ -384,9 +384,8 @@ describe('db', () => {
                 '  password varchar(45)  NULL,\r\n' +
                 '  role_id int  NULL,\r\n' +
                 '  createdat datetime  NULL,\r\n' +
-                ')\r\n');
-              expect(createScript).to.contain('ALTER TABLE users ADD CONSTRAINT PK__users');
-              expect(createScript).to.contain('PRIMARY KEY (id)');
+                ')\r\n' +
+                'ALTER TABLE users ADD CONSTRAINT PK__users PRIMARY KEY (id);\r\n');
             } else if (dbClient === 'sqlite') {
               expect(createScript).to.eql('CREATE TABLE users (\n' +
                 '  id INTEGER NOT NULL,\n' +
@@ -396,7 +395,7 @@ describe('db', () => {
                 '  role_id INT,\n' +
                 '  createdat DATETIME NULL,\n' +
                 '  PRIMARY KEY (id),\n' +
-                '  FOREIGN KEY (role_id) REFERENCES roles (id)\n)',
+                '  FOREIGN KEY (role_id) REFERENCES roles (id)\n);\n',
               );
             } else if (dbClient === 'cassandra') {
               expect(createScript).to.eql(undefined);
