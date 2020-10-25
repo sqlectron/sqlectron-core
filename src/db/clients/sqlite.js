@@ -199,7 +199,7 @@ export async function getTableCreateScript(conn, table) {
 
   const { data } = await driverExecuteQuery(conn, { query: sql });
 
-  return data.map((row) => row.sql);
+  return data.map((row) => `${row.sql};\n`);
 }
 
 export async function getViewCreateScript(conn, view) {
