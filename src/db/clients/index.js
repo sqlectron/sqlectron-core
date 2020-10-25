@@ -64,7 +64,6 @@ export const CLIENTS = [
       'server:schema',
       'server:domain',
       'server:ssh',
-      'scriptCreateTable',
       'cancelQuery',
     ],
   },
