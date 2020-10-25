@@ -373,7 +373,6 @@ describe('db', () => {
                 '  role_id integer NULL,\n' +
                 '  createdat date NULL\n' +
                 ');\n' +
-                '\n' +
                 'ALTER TABLE public.users ADD CONSTRAINT users_pkey PRIMARY KEY (id);\n',
               );
             } else if (dbClient === 'sqlserver') {

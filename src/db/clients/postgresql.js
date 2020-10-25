@@ -423,8 +423,9 @@ export async function getTableCreateScript(conn, table, schema) {
 
   const constraintResult = (await driverExecuteQuery(conn, { query: constraintSql, params })).rows[0];
   if (constraintResult.constraint.length > 0) {
-    createTable += `\n${constraintResult.constraint}`;
+    createTable += `${constraintResult.constraint};\n`;
   }
+
   return [createTable];
 }
 
