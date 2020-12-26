@@ -1,5 +1,5 @@
 import Valida from 'valida2';
-import { CLIENTS } from '../db';
+import { ADAPTERS as CLIENTS } from 'sqlectron-db-core';
 
 
 function serverAddressValidator(ctx) {

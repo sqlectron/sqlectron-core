@@ -1,11 +1,12 @@
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { stub } from 'sinon';
+
 import config from './databases/config';
 import setupSQLite from './databases/sqlite/setup';
 import setupCassandra from './databases/cassandra/setup';
 import { db, config as srcConfig } from '../src';
-import { clearLimitSelect } from '../src/db/client';
+import { setSelectLimit, clearSelectLimit } from '../src/limit';
 import { versionCompare } from '../src/utils';
 
 chai.use(chaiAsPromised);
@@ -95,13 +96,6 @@ describe('db', () => {
         describe('.disconnect', () => {
           it('should close all connections in the pool', () => {
             dbConn.disconnect();
-          });
-        });
-
-        describe('.version', () => {
-          it('should return version string', () => {
-            const version = dbConn.version();
-            expect(version).to.be.a('string').and.not.be.empty;
           });
         });
 
@@ -643,7 +637,7 @@ describe('db', () => {
 
           afterEach(() => {
             stubObj.restore();
-            clearLimitSelect();
+            clearSelectLimit();
           });
 
           it('should return select with default limit', async () => {
@@ -666,6 +660,7 @@ describe('db', () => {
             stubObj.returns({
               limitQueryDefaultSelectTop: 125,
             });
+            await setSelectLimit();
             const sql = await dbConn.getQuerySelectTop('test_table');
             if (mysqlClients.includes(dbClient)) {
               expect(sql).to.eql('SELECT * FROM `test_table` LIMIT 125');
