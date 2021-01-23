@@ -4,7 +4,7 @@ import path from 'path';
 import mkdirp from 'mkdirp';
 import envPaths from 'env-paths';
 
-import { readFile, resolveHomePathToAbsolute } from 'sqlectron-db-core';
+import { readFile, resolveHomePathToAbsolute } from 'sqlectron-db-core/utils';
 
 export {
   createCancelablePromise,
