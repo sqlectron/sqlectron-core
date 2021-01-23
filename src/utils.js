@@ -4,13 +4,7 @@ import path from 'path';
 import mkdirp from 'mkdirp';
 import envPaths from 'env-paths';
 
-import {
-  createCancelablePromise,
-  getPort,
-  readFile,
-  resolveHomePathToAbsolute,
-  versionCompare,
-} from 'sqlectron-db-core/utils';
+import { readFile, resolveHomePathToAbsolute } from 'sqlectron-db-core';
 
 export {
   createCancelablePromise,
@@ -18,7 +12,7 @@ export {
   readFile,
   resolveHomePathToAbsolute,
   versionCompare,
-};
+} from 'sqlectron-db-core/utils';
 
 let configPath = '';
 
