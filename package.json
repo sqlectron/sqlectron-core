@@ -35,17 +35,9 @@
     "node": ">=6"
   },
   "dependencies": {
-    "cassandra-driver": "^3.1.1",
-    "debug": "^2.2.0",
     "env-paths": "^1.0.0",
     "mkdirp": "^0.5.2",
-    "mssql": "^6.2.1",
-    "mysql2": "^2.1.0",
-    "pg": "^7.18.0",
-    "portfinder": "^0.4.0",
-    "sql-query-identifier": "^1.1.0",
-    "sqlite3": "^4.0.6",
-    "ssh2": "^0.5.0",
+    "sqlectron-db-core": "^0.6.2",
     "uuid": "^3.0.0",
     "valida2": "^2.5.0"
   },
@@ -58,6 +50,7 @@
     "@babel/plugin-transform-modules-commonjs": "^7.9.6",
     "@babel/register": "^7.9.0",
     "babel-eslint": "^10.1.0",
+    "cassandra-driver": "^3.1.1",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "connection-string": "^3.4.2",
@@ -66,7 +59,8 @@
     "eslint-plugin-import": "^2.20.2",
     "mocha": "^6.2.3",
     "nyc": "^14.1.1",
-    "sinon": "^7.5.0"
+    "sinon": "^7.5.0",
+    "sqlite3": "^4.0.6"
   },
   "nyc": {
     "include": "src",
