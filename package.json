@@ -37,7 +37,7 @@
   "dependencies": {
     "env-paths": "^1.0.0",
     "mkdirp": "^0.5.2",
-    "sqlectron-db-core": "^0.6.2",
+    "sqlectron-db-core": "^0.7.0",
     "uuid": "^8.3.2",
     "valida2": "^2.5.0"
   },
@@ -60,7 +60,7 @@
     "mocha": "^6.2.3",
     "nyc": "^14.1.1",
     "sinon": "^7.5.0",
-    "sqlite3": "^4.0.6"
+    "sqlite3": "^5.0.1"
   },
   "nyc": {
     "include": "src",
