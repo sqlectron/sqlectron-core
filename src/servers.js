@@ -1,4 +1,4 @@
-import uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { validate, validateUniqueId } from './validators/server';
 import * as config from './config';
 import * as crypto from './crypto';
@@ -17,7 +17,7 @@ export async function add(server, cryptoSecret) {
   const data = await config.get();
   let newId;
   do {
-    newId = uuid.v4();
+    newId = uuidv4();
   } while (!validateUniqueId(data.servers, newId));
 
   srv = encryptSecrects(srv, cryptoSecret);

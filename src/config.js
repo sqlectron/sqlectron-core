@@ -1,4 +1,4 @@
-import uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import * as utils from './utils';
 import * as crypto from './crypto';
 
@@ -8,7 +8,7 @@ function sanitizeServer(server, cryptoSecret) {
   const srv = { ...server };
 
   // ensure has an unique id
-  if (!srv.id) { srv.id = uuid.v4(); }
+  if (!srv.id) { srv.id = uuidv4(); }
 
   // ensure has the new fileld SSL
   srv.ssl = srv.ssl || false;
