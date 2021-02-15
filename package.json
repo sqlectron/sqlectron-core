@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "env-paths": "^1.0.0",
-    "mkdirp": "^0.5.2",
+    "mkdirp": "^1.0.4",
     "sqlectron-db-core": "^0.7.0",
     "uuid": "^8.3.2",
     "valida2": "^2.5.0"

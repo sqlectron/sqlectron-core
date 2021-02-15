@@ -88,9 +88,7 @@ export function readJSONFileSync(filename) {
 }
 
 export function createParentDirectory(filename) {
-  return new Promise((resolve, reject) =>
-    (mkdirp(path.dirname(filename), (err) => (err ? reject(err) : resolve()))),
-  );
+  return mkdirp(path.dirname(filename));
 }
 
 export function createParentDirectorySync(filename) {
