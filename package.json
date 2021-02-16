@@ -1,6 +1,6 @@
 {
   "name": "sqlectron-core",
-  "version": "9.0.0",
+  "version": "9.0.1",
   "description": "sqlectron-core",
   "main": "lib/index.js",
   "author": "The SQLECTRON Team",
@@ -35,7 +35,7 @@
     "node": ">=10"
   },
   "dependencies": {
-    "env-paths": "^1.0.0",
+    "env-paths": "^2.2.0",
     "mkdirp": "^1.0.4",
     "sqlectron-db-core": "^0.7.0",
     "uuid": "^8.3.2",
