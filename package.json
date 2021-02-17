@@ -35,7 +35,7 @@
     "node": ">=10"
   },
   "dependencies": {
-    "env-paths": "^2.2.0",
+    "env-paths": "^1.0.0",
     "mkdirp": "^1.0.4",
     "sqlectron-db-core": "^0.7.0",
     "uuid": "^8.3.2",
