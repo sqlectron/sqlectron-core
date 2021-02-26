@@ -1,10 +1,6 @@
 name: Test
 
-on:
-  push:
-    branches: [ '*' ]
-  pull_request:
-    branches: [ '*' ]
+on: ['push', 'pull_request']
 
 jobs:
   build:
@@ -17,50 +13,11 @@ jobs:
       matrix:
         include:
           - node-version: 10.x
-            mysql-version: 5.7
-            maraidb-version: 10.1
-            cassandra-version: "2.1"
-            postgres-version: 9
-            sqlserver-collation: Latin1_General_CI_AS
-          - node-version: 10.x
-            mysql-version: 8
-            maraidb-version: 10.5
-            cassandra-version: "3.0"
-            postgres-version: 13
-            sqlserver-collation: Latin1_General_CS_AS
           - node-version: 12.x
-            mysql-version: 5.7
-            maraidb-version: 10.1
-            cassandra-version: "3.0"
-            postgres-version: 9
-            sqlserver-collation: Latin1_General_CS_AS
           - node-version: 14.x
-            mysql-version: 8
-            maraidb-version: 10.5
-            cassandra-version: 3
-            postgres-version: 13
-            sqlserver-collation: Latin1_General_CI_AS
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: Create MySQL Container
-      run: docker run --rm -d --name mysql -e "MYSQL_ROOT_PASSWORD=Password12!" -e "MYSQL_DATABASE=sqlectron" -p 3306:3306 -v ${GITHUB_WORKSPACE}/spec/databases/mysql/schema:/docker-entrypoint-initdb.d mysql:${{ matrix.mysql-version }}
-
-    - name: Create MariaDB Container
-      run: docker run --rm -d --name mariadb -e "MYSQL_ROOT_PASSWORD=Password12!" -e "MYSQL_DATABASE=sqlectron" -p 3307:3306 -v ${GITHUB_WORKSPACE}/spec/databases/mysql/schema:/docker-entrypoint-initdb.d mariadb:${{ matrix.maraidb-version }}
-
-    - name: Create Postgres Container
-      run: docker run --rm -d --name postgres -e "POSTGRES_PASSWORD=Password12!" -e "POSTGRES_DB=sqlectron" -p 5432:5432 -v ${GITHUB_WORKSPACE}/spec/databases/postgresql/schema:/docker-entrypoint-initdb.d postgres:${{ matrix.postgres-version }}
-
-    - name: Create Redshift Container
-      run: docker run --rm -d --name redshift -e "POSTGRES_PASSWORD=Password12!" -e "POSTGRES_DATABASE=sqlectron" -p 5433:5432 -v ${GITHUB_WORKSPACE}/spec/databases/redshift/schema:/docker-entrypoint-initdb.d foundryai/postgres8:${{ env.redshift-version }}
-
-    - name: Create Cassandra Container
-      run: docker run --rm -d --name cassandra -p 9042:9042 -v ${GITHUB_WORKSPACE}/spec/databases/cassandra/schema:/docker-entrypoint-initdb.d  cassandra:${{ matrix.cassandra-version }}
-
-    - name: Create SQLServer Container
-      run: docker run --rm -d --name sqlserver -p 1433:1433 -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Password12!" -e "MSSQL_COLLATION=${{ matrix.sqlserver-collation }}" -v ${GITHUB_WORKSPACE}/spec/databases/sqlserver/schema:/docker-entrypoint-initdb.d mcr.microsoft.com/mssql/server:2017-latest
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
@@ -77,13 +34,4 @@ jobs:
     - run: npm run lint
     - run: npm run compile
 
-    # Set-up containers that do not support initialization sequences
-    - name: Create Cassandra Schema
-      run: docker exec -i cassandra /bin/bash -c "until cqlsh -f /docker-entrypoint-initdb.d/schema.cql; do sleep 2; done"
-
-    - name: Create SQLServer Database
-      run: docker exec -i sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost,1433 -U sa -P Password12! -Q "CREATE DATABASE sqlectron" -d "master"
-    - name: Initialize SQLServer Schema
-      run: docker exec -i sqlserver /opt/mssql-tools/bin/sqlcmd -S localhost,1433 -U sa -P Password12! -i /docker-entrypoint-initdb.d/schema.sql -d "sqlectron"
-
-    - run: DB_CLIENTS=mysql,mariadb,postgresql,redshift,sqlite,sqlserver,cassandra npm run test:coverage
+    - run: npm run test:coverage
