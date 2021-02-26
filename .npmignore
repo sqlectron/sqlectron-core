@@ -1,1 +1,9 @@
 src/
+spec/
+.github/
+.vscode/
+.babelrc
+.eslintrc
+.editorconfig
+Dockerfile
+docker-compose.yml
