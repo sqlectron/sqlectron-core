@@ -83,7 +83,7 @@ export function readJSONFile(filename) {
 
 export function readJSONFileSync(filename) {
   const filePath = resolveHomePathToAbsolute(filename);
-  const data = fs.readFileSync(path.resolve(filePath), { enconding: 'utf-8' });
+  const data = fs.readFileSync(path.resolve(filePath), { encoding: 'utf-8' });
   return JSON.parse(data);
 }
 
