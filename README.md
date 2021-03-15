@@ -1,3 +1,5 @@
+**NOTE: The files of this repository have been merged directly into sqlectron-gui. As such, this repository is archived and no longer used or maintained.**
+
 # sqlectron-core
 
 [![Build Status](https://github.com/sqlectron/sqlectron-core/workflows/Test/badge.svg?branch=master)](https://github.com/sqlectron/sqlectron-core/actions?query=workflow%3ATest+branch%3Amaster)
